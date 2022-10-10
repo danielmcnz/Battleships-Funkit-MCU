@@ -23,10 +23,10 @@ all: game.out
 game.o: game.c defs.h cursor.h renderer.h ../../../drivers/avr/system.h ../../../drivers/display.h ../../../drivers/navswitch.h ../../../fonts/font5x7_1.h ../../../utils/font.h ../../../utils/pacer.h ../../../utils/tinygl.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
-cursor.o: cursor.c
+cursor.o: cursor.c ../../../drivers/avr/system.h ../../../drivers/navswitch.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
-renderer.o: renderer.c defs.h cursor.h ../../../utils/tinygl.h
+renderer.o: renderer.c defs.h ../../../utils/tinygl.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 # --------------------------------------------
