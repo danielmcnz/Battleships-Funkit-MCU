@@ -9,8 +9,8 @@ typedef struct
 {
     int8_t x;
     int8_t y;
-} cursor_t;
+} player_t;
 
-void update_cursor(void);
+void update_player(void);
 
-cursor_t get_cursor(void);
+player_t get_player(void);

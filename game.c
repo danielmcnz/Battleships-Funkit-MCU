@@ -2,32 +2,44 @@
 #include <navswitch.h>
 #include <pacer.h>
 #include <tinygl.h>
-#include <../fonts/font5x7_1.h>
+#include <button.h>
 
 #include "defs.h"
-#include "cursor.h"
+#include "player.h"
 #include "renderer.h"
 
 
-// static uint8_t friendlyShips[] = 
-// {
-//     0, 0, 0, 0, 0, 0, 0,
-//     0, 0, 0, 0, 0, 0, 0,
-//     0, 0, 0, 0, 0, 0, 0,
-//     0, 0, 0, 0, 0, 0, 0,
-//     0, 0, 0, 0, 0, 0, 0,
-// };
+enum gameState
+{
+    MAINMENU,
+    ATTACK,
+    DEFEND,
+};
 
-// static uint8_t friendlyShots[] =
-// {
-//     0, 0, 0, 0, 0, 0, 0,
-//     0, 0, 0, 0, 0, 0, 0,
-//     0, 0, 0, 0, 0, 0, 0,
-//     0, 0, 0, 0, 0, 0, 0,
-//     0, 0, 0, 0, 0, 0, 0,
-// };
+static enum gameState game_state;
 
-static uint8_t enemyShots[] =
+static int8_t buttonState = 1;
+
+void generate_ships(uint8_t map[35])
+{
+    uint8_t locations[] = 
+    {
+        1, 2, 0, 0, 0, 0, 0,
+        0, 0, 2, 0, 0, 0, 0,
+        0, 1, 0, 0, 0, 0, 2,
+        0, 0, 0, 0, 0, 0, 1,
+        0, 0, 0, 1, 2, 1, 2,
+    };
+
+
+    // fill map
+    for (uint8_t i=0; i<MAP_WIDTH * MAP_HEIGHT; ++i)
+    {
+        map[i] = locations[i];
+    }
+}
+
+static uint8_t friendlyShips[] = 
 {
     0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0,
@@ -36,19 +48,65 @@ static uint8_t enemyShots[] =
     0, 0, 0, 0, 0, 0, 0,
 };
 
+static uint8_t enemyGuesses[] =
+{
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+};
+
+static uint8_t friendlyGuesses[] =
+{
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+};
+
+
 void initialize(void)
 {
     system_init();
 
     tinygl_init(PACER_RATE);
     pacer_init(PACER_RATE);
+
+    button_init();
 }
 
 void update(void)
 {
     navswitch_update();
+    button_update();
     
-    update_cursor();
+    update_player();
+
+    switch(game_state)
+    {
+        case MAINMENU:
+            // if receive 1, defend, else if push pio, attack and send defend to other player
+
+
+            if(navswitch_push_event_p(NAVSWITCH_PUSH))
+            {
+                game_state = ATTACK;
+                // transmit 1 as enemy defend
+            }
+            break;
+        case ATTACK:
+            break;
+        case DEFEND:
+            break;
+    }
+
+
+    if(button_push_event_p(BUTTON1))
+        buttonState = -buttonState;
+
+    
 }
 
 void render(void)
@@ -56,13 +114,38 @@ void render(void)
     tinygl_update();
     draw_clear();
 
-    draw_map(enemyShots);
-    draw_flashing_pixel(get_cursor().x, get_cursor().y);
+    switch(game_state)
+    {
+        case MAINMENU:
+            
+            break;
+        case ATTACK:
+            if(buttonState == 1)
+            {
+                draw_map(friendlyGuesses);
+                draw_flashing_pixel(get_player().x, get_player().y);
+            }
+            else
+                draw_map(enemyGuesses);
+            break;
+        case DEFEND:
+            if(buttonState == 1)
+            {
+                draw_map(friendlyShips);
+            } 
+            else
+                draw_map(enemyGuesses);
+            break;
+    };   
 }
 
 int main (void)
 { 
     initialize();
+
+    game_state = ATTACK;
+
+    generate_ships(friendlyShips);
 
     while (1)
     {

@@ -20,10 +20,10 @@ all: game.out
 # --------------------------------------------
 # Src
 
-game.o: game.c defs.h cursor.h renderer.h ../../../drivers/avr/system.h ../../../drivers/display.h ../../../drivers/navswitch.h ../../../fonts/font5x7_1.h ../../../utils/font.h ../../../utils/pacer.h ../../../utils/tinygl.h
+game.o: game.c defs.h player.h renderer.h ../../../drivers/avr/system.h ../../../drivers/button.h ../../../drivers/display.h ../../../drivers/navswitch.h ../../../fonts/font5x7_1.h ../../../utils/font.h ../../../utils/pacer.h ../../../utils/tinygl.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
-cursor.o: cursor.c ../../../drivers/avr/system.h ../../../drivers/navswitch.h
+player.o: player.c ../../../drivers/avr/system.h ../../../drivers/navswitch.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 renderer.o: renderer.c defs.h ../../../utils/tinygl.h
@@ -62,12 +62,15 @@ pacer.o: ../../../utils/pacer.c ../../../drivers/avr/system.h ../../../drivers/a
 tinygl.o: ../../../utils/tinygl.c ../../../drivers/avr/system.h ../../../drivers/display.h ../../../utils/font.h ../../../utils/tinygl.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
+button.o: ../../../drivers/button.c ../../../drivers/button.h ../../../drivers/avr/system.h  ../../../drivers/avr/pio.h
+	$(CC) -c $(CFLAGS) $< -o $@
+
 # --------------------------------------------
 
 
 
 # Link: create ELF output file from object files.
-game.out: game.o cursor.o renderer.o pio.o system.o timer.o display.o ledmat.o font.o pacer.o tinygl.o navswitch.o
+game.out: game.o player.o renderer.o pio.o system.o timer.o display.o ledmat.o font.o pacer.o tinygl.o navswitch.o button.o
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 	$(SIZE) $@
 

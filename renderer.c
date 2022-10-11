@@ -22,7 +22,7 @@ void draw_dimmed_pixel(uint8_t x, uint8_t y)
     static uint8_t time = 0;
 
     tinygl_point_t point = {.x=x, .y=y};
-    if(time >= 9)
+    if(time >= DIMMED_FREQUENCY)
     {
         tinygl_draw_point(point, 1);
         time = 0;
