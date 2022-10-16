@@ -3,10 +3,12 @@
 #include <pacer.h>
 #include <tinygl.h>
 #include <button.h>
+#include <ir_uart.h>
 
 #include "defs.h"
 #include "player.h"
 #include "renderer.h"
+#include "starting_positions.h"
 
 
 enum gameState
@@ -20,22 +22,15 @@ static enum gameState game_state;
 
 static int8_t buttonState = 1;
 
+uint8_t rand;
+
 void generate_ships(uint8_t map[35])
 {
-    uint8_t locations[] = 
-    {
-        1, 2, 0, 0, 0, 0, 0,
-        0, 0, 2, 0, 0, 0, 0,
-        0, 1, 0, 0, 0, 0, 2,
-        0, 0, 0, 0, 0, 0, 1,
-        0, 0, 0, 1, 2, 1, 2,
-    };
-
-
+    uint8_t *location = locations[rand % 3];
     // fill map
     for (uint8_t i=0; i<MAP_WIDTH * MAP_HEIGHT; ++i)
     {
-        map[i] = locations[i];
+        map[i] = location[i];
     }
 }
 
@@ -66,6 +61,15 @@ static uint8_t friendlyGuesses[] =
     0, 0, 0, 0, 0, 0, 0,
 };
 
+static uint8_t mainmenu[] =
+{
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+    0, 1, 1, 1, 1, 1, 0,
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+};
+
 
 void initialize(void)
 {
@@ -88,15 +92,25 @@ void update(void)
     {
         case MAINMENU:
             // if receive 1, defend, else if push pio, attack and send defend to other player
+            // if(ir_get(1))
+            // {
+            //     game_state = ATTACK;
+            //     generate_ships(friendlyShips);
+            // }
+            // else
+            // {
+                if(navswitch_push_event_p(NAVSWITCH_PUSH))
+                {
+                    game_state = ATTACK;
+                    generate_ships(friendlyShips);
 
-
-            if(navswitch_push_event_p(NAVSWITCH_PUSH))
-            {
-                game_state = ATTACK;
-                // transmit 1 as enemy defend
-            }
+                    // ir_put(1);
+                    // transmit 1 as enemy defend
+                }
+            // }
             break;
         case ATTACK:
+            if(navswitch_push_event_p(NAVSWITCH_PUSH))
             break;
         case DEFEND:
             break;
@@ -117,7 +131,7 @@ void render(void)
     switch(game_state)
     {
         case MAINMENU:
-            
+            draw_map(mainmenu);
             break;
         case ATTACK:
             if(buttonState == 1)
@@ -141,11 +155,10 @@ void render(void)
 
 int main (void)
 { 
+    
     initialize();
 
-    game_state = ATTACK;
-
-    generate_ships(friendlyShips);
+    game_state = MAINMENU;
 
     while (1)
     {
@@ -153,6 +166,11 @@ int main (void)
 
         render();     
         update(); 
+        rand++;
+        if (rand >= 255){
+            rand = 0;
+
+        }
     }
 
     return 0;
