@@ -106,11 +106,13 @@ void update(void)
     
     update_player();
 
+    packet_t packet = {0};
+
     switch(game_state)
     {
         case MAINMENU:
             // if receive 1, defend, else if push pio, attack and send defend to other player
-            if(ir_get(1))
+            if(ir_uart_getc() == 1)
             {
                 game_state = DEFEND;
                 generate_ships(friendlyShips);
@@ -122,14 +124,13 @@ void update(void)
                     game_state = ATTACK;
                     generate_ships(friendlyShips);
 
-                    ir_put(1);
+                    ir_uart_putc(1);
                     // transmit 1 as enemy defend
                 }
             }
             break;
         case ATTACK:
             if (navswitch_push_event_p(NAVSWITCH_PUSH) && buttonState == 1) { 
-                packet_t packet = {0};
                 packet.coords.x = get_player().x;
                 packet.coords.y = get_player().y;
                 
@@ -147,7 +148,6 @@ void update(void)
             break;
         case DEFEND:
             // Receive X/Y coords
-            packet_t packet = {0};
             recv_coords(&packet, friendlyShips);
             
             //Update Matricies

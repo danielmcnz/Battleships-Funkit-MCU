@@ -2,8 +2,6 @@
 
 void send_coords(packet_t *packet)
 {
-    uint8_t result;
-
     ir_uart_putc(packet->coords.x);
     ir_uart_putc(packet->coords.y);
 
