@@ -72,7 +72,7 @@ static uint8_t mainmenu[] =
 };
 
 
-int Has_Player_Won(uint8_t friendlyShips[], uint8_t enemyGuesses[])
+int Has_Player_Won()
 {
     for (uint8_t i=0; i<MAP_WIDTH * MAP_HEIGHT; ++i)
     {
@@ -132,15 +132,9 @@ void update(void)
                 packet_t packet = {0};
                 packet.coords.x = get_player().x;
                 packet.coords.y = get_player().y;
+                
                 //SEND X/Y coords 
                 send_coords(&packet);
-
-
-
-                
-                //Recive If hit or miss
-                
-
                 
                 //Update Matricies
                 update_map(get_player(), friendlyGuesses, packet.result);
@@ -152,15 +146,18 @@ void update(void)
             
             break;
         case DEFEND:
-            // If Receive X/Y coords {
+            // Receive X/Y coords
             packet_t packet = {0};
-            recv_coords(&packet);
-            // CheckIfHit -> Return 1 if hit, 0 if miss
-            // Send 1 or 0
-            // GameState = Attack
+            recv_coords(&packet, friendlyShips);
+            
+            //Update Matricies
             update_map(get_player(), enemyGuesses, packet.result);
+
             // Check if enenmy guesses overlaps with friendly ships, game win if matches
-            game_state = DEFEND;
+            Has_Player_Won();
+
+            // GameState = Attack
+            game_state = ATTACK;
             break;
     }
 
