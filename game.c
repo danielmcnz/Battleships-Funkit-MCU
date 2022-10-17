@@ -9,6 +9,7 @@
 #include "player.h"
 #include "renderer.h"
 #include "starting_positions.h"
+#include "packet.h"
 
 
 enum gameState
@@ -36,18 +37,18 @@ void generate_ships(uint8_t map[35])
 
 static uint8_t friendlyShips[] = 
 {
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0,
 };
 
 static uint8_t enemyGuesses[] =
 {
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
+    1, 2, 0, 0, 0, 0, 0,
+    1, 2, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0,
 };
@@ -71,16 +72,20 @@ static uint8_t mainmenu[] =
 };
 
 
-int Has_Player_Won(friendlyShips,enemyGuesses)
+int Has_Player_Won(uint8_t friendlyShips[], uint8_t enemyGuesses[])
 {
     for (uint8_t i=0; i<MAP_WIDTH * MAP_HEIGHT; ++i)
     {
-        if (friendlyShips[i] == 1 & enemyGuesses[i] == 2 || friendlyShips[i] == 1 & enemyGuesses[i] == 0){
+        if (friendlyShips[i] == 1 && enemyGuesses[i] == 0){
             return 0;
         }
 
     } 
     return 1;
+}
+
+void update_map(player_t player, uint8_t Map[], uint8_t RESULT){
+    Map[MAP_HEIGHT * player.x + (MAP_HEIGHT-1)-player.y] = RESULT;
 }
 
 
@@ -124,22 +129,38 @@ void update(void)
             break;
         case ATTACK:
             if (navswitch_push_event_p(NAVSWITCH_PUSH) && buttonState == 1) { 
-            //SEND X/Y coords 
-            //Recive If hit or miss
-            //Update Matricies
-            //Check if enenmy guesses overlaps with friendly ships, game win if matches
-            GameState = DEFEND
+                packet_t packet = {0};
+                packet.coords.x = get_player().x;
+                packet.coords.y = get_player().y;
+                //SEND X/Y coords 
+                send_coords(&packet);
+
+
+
+                
+                //Recive If hit or miss
+                
+
+                
+                //Update Matricies
+                update_map(get_player(), friendlyGuesses, packet.result);
+                
+                //Check if enenmy guesses overlaps with friendly ships, game win if matches
+                game_state = DEFEND;
 
             }
             
             break;
         case DEFEND:
             // If Receive X/Y coords {
+            packet_t packet = {0};
+            recv_coords(&packet);
             // CheckIfHit -> Return 1 if hit, 0 if miss
             // Send 1 or 0
             // GameState = Attack
+            update_map(get_player(), enemyGuesses, packet.result);
             // Check if enenmy guesses overlaps with friendly ships, game win if matches
-            // GameState = DEFEND
+            game_state = DEFEND;
             break;
     }
 
