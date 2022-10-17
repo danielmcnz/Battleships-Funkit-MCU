@@ -4,6 +4,7 @@
 #include <tinygl.h>
 #include <button.h>
 #include <ir_uart.h>
+#include <../fonts/font3x5_1.h>
 
 #include "defs.h"
 #include "player.h"
@@ -76,6 +77,10 @@ void initialize(void)
     system_init();
 
     tinygl_init(PACER_RATE);
+    tinygl_font_set (&font3x5_1);
+    tinygl_text_mode_set (TINYGL_TEXT_MODE_STEP);
+    tinygl_text_dir_set (TINYGL_TEXT_DIR_ROTATE);
+
     pacer_init(PACER_RATE);
 
     button_init();
@@ -131,7 +136,8 @@ void render(void)
     switch(game_state)
     {
         case MAINMENU:
-            draw_map(mainmenu);
+            tinygl_text('B');
+            // draw_map(mainmenu);
             break;
         case ATTACK:
             if(buttonState == 1)
@@ -150,7 +156,7 @@ void render(void)
             else
                 draw_map(enemyGuesses);
             break;
-    };   
+    };
 }
 
 int main (void)
