@@ -4,7 +4,6 @@
 #include <tinygl.h>
 #include <button.h>
 #include <ir_uart.h>
-#include <../fonts/font3x5_1.h>
 
 #include "defs.h"
 #include "player.h"
@@ -72,15 +71,24 @@ static uint8_t mainmenu[] =
 };
 
 
+int Has_Player_Won(friendlyShips,enemyGuesses)
+{
+    for (uint8_t i=0; i<MAP_WIDTH * MAP_HEIGHT; ++i)
+    {
+        if (friendlyShips[i] == 1 & enemyGuesses[i] == 2 || friendlyShips[i] == 1 & enemyGuesses[i] == 0){
+            return 0;
+        }
+
+    } 
+    return 1;
+}
+
+
 void initialize(void)
 {
     system_init();
 
     tinygl_init(PACER_RATE);
-    tinygl_font_set (&font3x5_1);
-    tinygl_text_mode_set (TINYGL_TEXT_MODE_STEP);
-    tinygl_text_dir_set (TINYGL_TEXT_DIR_ROTATE);
-
     pacer_init(PACER_RATE);
 
     button_init();
@@ -97,27 +105,41 @@ void update(void)
     {
         case MAINMENU:
             // if receive 1, defend, else if push pio, attack and send defend to other player
-            // if(ir_get(1))
-            // {
-            //     game_state = ATTACK;
-            //     generate_ships(friendlyShips);
-            // }
-            // else
-            // {
+            if(ir_get(1))
+            {
+                game_state = DEFEND;
+                generate_ships(friendlyShips);
+            }
+            else
+            {
                 if(navswitch_push_event_p(NAVSWITCH_PUSH))
                 {
                     game_state = ATTACK;
                     generate_ships(friendlyShips);
 
-                    // ir_put(1);
+                    ir_put(1);
                     // transmit 1 as enemy defend
                 }
-            // }
+            }
             break;
         case ATTACK:
-            if(navswitch_push_event_p(NAVSWITCH_PUSH))
+            if (navswitch_push_event_p(NAVSWITCH_PUSH) && buttonState == 1) { 
+            //SEND X/Y coords 
+            //Recive If hit or miss
+            //Update Matricies
+            //Check if enenmy guesses overlaps with friendly ships, game win if matches
+            GameState = DEFEND
+
+            }
+            
             break;
         case DEFEND:
+            // If Receive X/Y coords {
+            // CheckIfHit -> Return 1 if hit, 0 if miss
+            // Send 1 or 0
+            // GameState = Attack
+            // Check if enenmy guesses overlaps with friendly ships, game win if matches
+            // GameState = DEFEND
             break;
     }
 
@@ -136,14 +158,14 @@ void render(void)
     switch(game_state)
     {
         case MAINMENU:
-            tinygl_text('B');
-            // draw_map(mainmenu);
+            draw_map(mainmenu);
             break;
         case ATTACK:
             if(buttonState == 1)
             {
                 draw_map(friendlyGuesses);
                 draw_flashing_pixel(get_player().x, get_player().y);
+
             }
             else
                 draw_map(enemyGuesses);
@@ -156,7 +178,7 @@ void render(void)
             else
                 draw_map(enemyGuesses);
             break;
-    };
+    };   
 }
 
 int main (void)
