@@ -17,6 +17,6 @@ typedef struct
 } packet_t;
 
 
-void send_coords(packet_t *packet);
+uint8_t send_coords(packet_t *packet);
 
-void recv_coords(packet_t *packet, uint8_t friendly_ships[]);
+uint8_t recv_coords(packet_t *packet, uint8_t friendly_ships[]);

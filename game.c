@@ -57,9 +57,9 @@ static uint8_t friendlyGuesses[] =
 {
     0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 1, 0, 0, 0, 0,
+    0, 0, 0, 1, 0, 0, 0,
+    0, 0, 0, 0, 1, 0, 0,
 };
 
 static uint8_t mainmenu[] =
@@ -97,6 +97,8 @@ void initialize(void)
     pacer_init(PACER_RATE);
 
     button_init();
+
+    ir_uart_init();
 }
 
 void update(void)
@@ -108,14 +110,19 @@ void update(void)
 
     packet_t packet = {0};
 
+    static uint8_t recv = 0;
+
     switch(game_state)
     {
         case MAINMENU:
             // if receive 1, defend, else if push pio, attack and send defend to other player
-            if(ir_uart_getc() == 1)
+            if(ir_uart_read_ready_p())
             {
-                game_state = DEFEND;
-                generate_ships(friendlyShips);
+                if(ir_uart_getc() == 0)
+                {
+                    game_state = DEFEND;
+                    generate_ships(friendlyShips);
+                }
             }
             else
             {
@@ -134,30 +141,35 @@ void update(void)
                 packet.coords.x = get_player().x;
                 packet.coords.y = get_player().y;
                 
-                //SEND X/Y coords 
-                send_coords(&packet);
+                //SEND X/Y coords
+                recv = send_coords(&packet);
                 
-                //Update Matricies
-                update_map(get_player(), friendlyGuesses, packet.result);
-                
-                //Check if enenmy guesses overlaps with friendly ships, game win if matches
-                game_state = DEFEND;
-
+                if(recv == 1)
+                {
+                    //Update Matricies
+                    update_map(get_player(), friendlyGuesses, packet.result);
+                    
+                    //Check if enenmy guesses overlaps with friendly ships, game win if matches
+                    game_state = DEFEND;
+                }
             }
             
             break;
         case DEFEND:
             // Receive X/Y coords
-            recv_coords(&packet, friendlyShips);
+            recv = recv_coords(&packet, friendlyShips);
             
-            //Update Matricies
-            update_map(get_player(), enemyGuesses, packet.result);
+            if(recv == 1)
+            {
+                //Update Matricies
+                update_map(get_player(), enemyGuesses, packet.result);
 
-            // Check if enenmy guesses overlaps with friendly ships, game win if matches
-            Has_Player_Won();
+                // Check if enenmy guesses overlaps with friendly ships, game win if matches
+                Has_Player_Won();
 
-            // GameState = Attack
-            game_state = ATTACK;
+                // GameState = Attack
+                game_state = ATTACK;
+            }
             break;
     }
 
@@ -183,7 +195,6 @@ void render(void)
             {
                 draw_map(friendlyGuesses);
                 draw_flashing_pixel(get_player().x, get_player().y);
-
             }
             else
                 draw_map(enemyGuesses);
