@@ -22,6 +22,8 @@ void recv_coords(packet_t *packet, uint8_t friendly_ships[])
         for(uint8_t y=0; y<MAP_HEIGHT; ++y)
         {
             uint8_t result = friendly_ships[MAP_HEIGHT * x + (MAP_HEIGHT-1)-y];
+            if(result == 0)
+                result = 2;
             packet->result = result;
             ir_uart_putc(result);
         }
