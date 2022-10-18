@@ -1,7 +1,7 @@
 # File:   Makefile
-# Author: M. P. Hayes, UCECE
-# Date:   12 Sep 2010
-# Descr:  Makefile for game
+# Author: C. Hall-Fernandez, D. Mcgregor
+# Date:   19/10/2022
+# Descr:  Makefile for 'Battleships' game
 
 # Definitions.
 CC = avr-gcc

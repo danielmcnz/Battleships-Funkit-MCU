@@ -1,7 +1,8 @@
 #include <stdint.h>
 
+#define AMOUNT_OF_MAPS 3
 
-uint8_t locations[3][35] = {{
+uint8_t locations[AMOUNT_OF_MAPS][35] = {{
         1, 0, 1, 1, 1, 1, 0,
         1, 0, 0, 0, 0, 0, 0,
         1, 0, 0, 0, 0, 0, 0,
