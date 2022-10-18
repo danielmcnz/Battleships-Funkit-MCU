@@ -9,7 +9,14 @@
 
 #include <tinygl.h>
 
+#include <font3x5_1.h>
+
 #include "defs.h"
+
+
+void renderer_init();
+
+
 
 /** Draws a flashing pixel
  *  @param x x coordinate on the map

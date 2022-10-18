@@ -32,6 +32,9 @@ typedef struct
 } packet_t;
 
 
+void packet_init();
+
+
 /** Handles ir communications in attack mode
  *  @param packet ir communication packet for sending and receiving data
  *  @return returns 1 when finished communications and filled the packet, otherwise 0

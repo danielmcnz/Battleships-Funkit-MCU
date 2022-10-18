@@ -8,6 +8,12 @@
 #include "packet.h"
 
 
+void packet_init()
+{
+    ir_uart_init();
+}
+
+
 uint8_t send_coords(packet_t *packet)
 {
     static uint8_t recv = 0;

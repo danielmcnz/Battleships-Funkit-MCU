@@ -10,7 +10,6 @@
 #include <navswitch.h>
 #include <pacer.h>
 #include <tinygl.h>
-#include <font3x5_1.h>
 #include <button.h>
 #include <ir_uart.h>
 
@@ -36,7 +35,7 @@ enum gameState
 static enum gameState prev_game_state;
 static enum gameState game_state;
 
-static int8_t TopButton = 1;
+static int8_t top_button = 1;
 
 uint8_t rand = 0;
 
@@ -107,7 +106,7 @@ void generate_ships(uint8_t map[35])
 
 
 //Creating arrays which will become maps
-static uint8_t friendlyShips[] = 
+static uint8_t friendly_ships[] = 
 {
     0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0,
@@ -116,7 +115,7 @@ static uint8_t friendlyShips[] =
     0, 0, 0, 0, 0, 0, 0,
 };
 
-static uint8_t enemyGuesses[] =
+static uint8_t enemy_guesses[] =
 {
     0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0,
@@ -125,7 +124,7 @@ static uint8_t enemyGuesses[] =
     0, 0, 0, 0, 0, 0, 0,
 };
 
-static uint8_t friendlyGuesses[] =
+static uint8_t friendly_guesses[] =
 {
     0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0,
@@ -140,7 +139,7 @@ int has_player_won(void)
 {
     for (uint8_t i=0; i<MAP_WIDTH * MAP_HEIGHT; ++i)
     {
-        if (friendlyShips[i] == 1 && enemyGuesses[i] == 0){
+        if (friendly_ships[i] == 1 && enemy_guesses[i] == 0){
             return 0;
         }
 
@@ -164,17 +163,13 @@ void initialize(void)
 {
     system_init();
 
-    tinygl_init(DISPLAY_RATE);
-    tinygl_font_set(&font3x5_1);
-    tinygl_text_mode_set(TINYGL_TEXT_MODE_SCROLL);
-    tinygl_text_dir_set(TINYGL_TEXT_DIR_ROTATE);
-    tinygl_text_speed_set(MESSAGE_RATE);
+    renderer_init();
+
+    packet_init();
 
     pacer_init(PACER_RATE);
 
     button_init();
-
-    ir_uart_init();
 }
 
 /**Updates the internal game logic
@@ -199,7 +194,7 @@ void update(void)
             if(navswitch_push_event_p(NAVSWITCH_PUSH)) //Updating nav pressed down
                 nav_push_down = 1;
 
-            if (nav_push_down == 1 && TopButton == 1) { //If a shot is fired, get X/Y position of cursor
+            if (nav_push_down == 1 && top_button == 1) { //If a shot is fired, get X/Y position of cursor
                 packet.coords.x = get_player().x;
                 packet.coords.y = get_player().y;
                 
@@ -209,7 +204,7 @@ void update(void)
                 if(recv == 1)
                 {
                     
-                    update_map(packet.coords, friendlyGuesses, packet.result); //Update Map
+                    update_map(packet.coords, friendly_guesses, packet.result); //Update Map
                     
                     /** @todo GAME WINNING
                     */
@@ -232,12 +227,12 @@ void update(void)
             break;
         case DEFEND:
             
-            recv = recv_coords(&packet, friendlyShips); // Receive X&Y coords of attack fire. Sets recv to 1 if 
+            recv = recv_coords(&packet, friendly_ships); // Receive X&Y coords of attack fire. Sets recv to 1 if 
             
             if(recv == 1)
             {
                 
-                update_map(packet.coords, enemyGuesses, packet.result); //Update Map
+                update_map(packet.coords, enemy_guesses, packet.result); //Update Map
 
                 /** @todo GAME WINNING
                                     */
@@ -261,7 +256,7 @@ void update(void)
                 if(ir_uart_getc() == 1)
                 {
                     game_state = DEFEND; 
-                    generate_ships(friendlyShips);
+                    generate_ships(friendly_ships);
                 }
             }
             else
@@ -269,7 +264,7 @@ void update(void)
                 if(navswitch_push_event_p(NAVSWITCH_PUSH)) //Send '1' to other player, telling them to defend and you set to attack first. 
                 {
                     game_state = ATTACK;
-                    generate_ships(friendlyShips);
+                    generate_ships(friendly_ships);
                     ir_uart_putc(1);
                 }
             }
@@ -299,7 +294,7 @@ void update(void)
 
 
     if(button_push_event_p(BUTTON1)) //Update top button toggle, which is used in the renderer function to update screen/ 
-        TopButton = -TopButton;
+        top_button = -top_button;
 
     
 }
@@ -322,21 +317,21 @@ void render(void)
     switch(game_state)
     {
         case ATTACK: //ATTACK MODE
-            if(TopButton == 1) 
+            if(top_button == 1) 
             {
-                draw_map(friendlyGuesses); //If top Button toggled to one, draw your guesses map
+                draw_map(friendly_guesses); //If top Button toggled to one, draw your guesses map
                 draw_flashing_pixel(get_player().x, get_player().y); //Draw 'aiming' cursor over top
             }
             else
-                draw_map(enemyGuesses); //If top Button toggled to 0, draw enemy guesses map
+                draw_map(enemy_guesses); //If top Button toggled to 0, draw enemy guesses map
             break;
         case DEFEND: //DEFEND MODE
-            if(TopButton == 1)
+            if(top_button == 1)
             {
-                draw_map(friendlyShips); //If top Button toggled to one, draw your ships map
+                draw_map(friendly_ships); //If top Button toggled to one, draw your ships map
             } 
             else
-                draw_map(enemyGuesses); //If top Button toggled to 0, draw enemy guesses map
+                draw_map(enemy_guesses); //If top Button toggled to 0, draw enemy guesses map
             break;
         case MAIN_MENU: //MAIN MENU
             if(!title_set)
