@@ -1,3 +1,10 @@
+/**
+ *  @file   player.h
+ *  @author D. McGregor, C. Hall-Fernandez
+ *  @date   18 October 2022
+ *  @brief  player module
+ */
+
 #pragma once
 
 #include <stdint.h>

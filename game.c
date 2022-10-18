@@ -1,3 +1,10 @@
+/**
+ *  @file   game.c
+ *  @author D. McGregor, C. Hall-Fernandez
+ *  @date   18 October 2022
+ *  @brief  Battleships main game logic
+ */
+
 #include <system.h>
 #include <navswitch.h>
 #include <pacer.h>
@@ -15,7 +22,7 @@
 
 enum gameState
 {
-    MAINMENU,
+    MAIN_MENU,
     WIN,
     LOSE,
     HIT,
@@ -31,6 +38,9 @@ static int8_t buttonState = 1;
 
 uint8_t rand = 0;
 
+/** Generate random locations for friendly ships
+ *  @param map friendly ships map
+*/
 void generate_ships(uint8_t map[35])
 {
     // uint8_t direction = rand % 2; // horizontal = 0, vertical = 1
@@ -121,7 +131,7 @@ static uint8_t friendlyGuesses[] =
 };
 
 
-int Has_Player_Won(void)
+int has_player_won(void)
 {
     for (uint8_t i=0; i<MAP_WIDTH * MAP_HEIGHT; ++i)
     {
@@ -216,7 +226,7 @@ void update(void)
                 update_map(packet.coords, enemyGuesses, packet.result);
 
                 // Check if enenmy guesses overlaps with friendly ships, game win if matches
-                // Has_Player_Won()
+                // has_player_won()
 
                 game_state = ATTACK;
                 prev_game_state = game_state;
@@ -230,7 +240,7 @@ void update(void)
                 // }
             }
             break;
-        case MAINMENU:
+        case MAIN_MENU:
             // if receive 1, defend, else if push pio, attack and send defend to other player
             if(ir_uart_read_ready_p())
             {
@@ -314,7 +324,7 @@ void render(void)
             else
                 draw_map(enemyGuesses);
             break;
-        case MAINMENU:
+        case MAIN_MENU:
             if(!title_set)
             {
                 tinygl_text("BATTLESHIPS");
@@ -358,7 +368,7 @@ int main(void)
 
     uint8_t render_time = 0;
 
-    game_state = MAINMENU;
+    game_state = MAIN_MENU;
 
     while (1)
     {

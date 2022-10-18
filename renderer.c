@@ -1,3 +1,10 @@
+/**
+ *  @file   renderer.c
+ *  @author D. McGregor, C. Hall-Fernandez
+ *  @date   18 October 2022
+ *  @brief  renderer support for drawing pixels and map arrays
+ */
+
 #include "renderer.h"
 
 void draw_flashing_pixel(uint8_t x, uint8_t y)

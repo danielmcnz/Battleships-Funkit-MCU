@@ -1,3 +1,10 @@
+/**
+ *  @file   player.c
+ *  @author D. McGregor, C. Hall-Fernandez
+ *  @date   18 October 2022
+ *  @brief  player module
+ */
+
 #include "player.h"
 
 static pos_t player = {0};
