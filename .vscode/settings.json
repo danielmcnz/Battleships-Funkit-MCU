@@ -3,6 +3,8 @@
         "pacer.h": "c",
         "ir_uart.h": "c",
         "delay.h": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "button.h": "c",
+        "navswitch.h": "c"
     }
 }

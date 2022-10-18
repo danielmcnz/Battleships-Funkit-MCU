@@ -1,4 +1,12 @@
+/**
+ *  @file   packet.c
+ *  @author D. McGregor, C. Hall-Fernandez
+ *  @date   18 October 2022
+ *  @brief  IR communication packet handler
+ */
+
 #include "packet.h"
+
 
 uint8_t send_coords(packet_t *packet)
 {
@@ -26,6 +34,7 @@ uint8_t send_coords(packet_t *packet)
         }
     return 0;
 }
+
 
 uint8_t recv_coords(packet_t *packet, uint8_t friendly_ships[])
 {
