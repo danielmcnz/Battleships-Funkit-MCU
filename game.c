@@ -17,8 +17,40 @@
 #include "defs.h"
 #include "player.h"
 #include "renderer.h"
-#include "starting_positions.h"
 #include "packet.h"
+#include "map.h"
+#include "random.h"
+
+
+/** Creating arrays which will become maps */
+uint8_t friendly_ships[] = 
+{
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+};
+
+
+uint8_t enemy_guesses[] =
+{
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+};
+
+
+uint8_t friendly_guesses[] =
+{
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+};
 
 
 enum gameState
@@ -37,125 +69,6 @@ static enum gameState game_state;
 
 static int8_t top_button = 1;
 
-uint8_t rand = 0;
-
-/** Generate random locations for friendly ships
- *  @param map friendly ships map
-*/
-void generate_ships(uint8_t map[35])
-{
-    // uint8_t direction = rand % 2; // horizontal = 0, vertical = 1
-
-    // // pos_t boats[] = { (1, 2), (1, 3),
-    // //                     (3, 2), (3, 3),
-    // //                     (2, 1), (3, 1), (4, 1)
-    // //                 };
-
-    // pos_t boats[] = {0};
-
-    // uint8_t pixel_count = 0;
-
-    // for(uint8_t n_boat = 0; n_boat < MAX_SHIPS; ++n_boat)
-    // {
-    //     for(uint8_t n_pixel = 1; n_pixel < BATTLESHIPS[n_boat]; ++n_pixel)
-    //     {
-    //         if(n_pixel == 0)
-    //         {
-    //             if(direction == 0)
-    //             {
-    //                 boats[pixel_count + n_pixel].x = rand % (MAP_HEIGHT + 1 - BATTLESHIPS[n_boat]);
-    //                 boats[pixel_count + n_pixel].y = rand % (MAP_WIDTH + 1);
-    //             }
-    //             else
-    //             {
-    //                 boats[pixel_count + n_pixel].x = rand % (MAP_WIDTH + 1);
-    //                 boats[pixel_count + n_pixel].y = rand % (MAP_HEIGHT + 1 - BATTLESHIPS[n_boat]);
-    //             }
-    //         }
-    //         else
-    //         {
-    //             if(direction == 0)
-    //             {
-    //                 boats[pixel_count + n_pixel].x = boats[pixel_count + n_pixel-1].x++;
-    //             }
-    //             else
-    //             {
-    //                 boats[pixel_count + n_pixel].y = boats[pixel_count + n_pixel-1].y++;
-    //             }
-    //         }
-
-    //         ++pixel_count;
-    //     }
-
-        
-    // }
-
-    // fill map
-
-
-
-
-    uint8_t *location = locations[rand % 3];
-
-    // fill map
-    for (uint8_t i=0; i<MAP_WIDTH * MAP_HEIGHT; ++i)
-    {
-        map[i] = location[i];
-    }
-}
-
-
-//Creating arrays which will become maps
-static uint8_t friendly_ships[] = 
-{
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-};
-
-static uint8_t enemy_guesses[] =
-{
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-};
-
-static uint8_t friendly_guesses[] =
-{
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-};
-
-//Loops through both enenemy and friendly guesses and checks if there are any ships without being fully hit. 
-//Returns 1 if enemy guesses fully encapulates friendly ships
-int has_player_won(void)
-{
-    for (uint8_t i=0; i<MAP_WIDTH * MAP_HEIGHT; ++i)
-    {
-        if (friendly_ships[i] == 1 && enemy_guesses[i] == 0){
-            return 0;
-        }
-
-    } 
-    return 1;
-}
-
-
-/** Updates a map 
- *  @param coords X/Y coordernate struct, 
- *  @param Map Map that needs to be updated
- *  @param RESULT The value to be written (0 = No guess/off, 1 = Hit/Fully on, 2 = Miss/Dimmed)
-*/
-void update_map(coords_t coords, uint8_t Map[], uint8_t RESULT){
-    Map[MAP_HEIGHT * coords.x + (MAP_HEIGHT - 1) - coords.y] = RESULT;
-}
 
 /**Initialising various modules
 */
@@ -179,6 +92,7 @@ void update(void)
     navswitch_update();
     button_update();
     update_player();
+    update_rand();
 
     packet_t packet = {0};
 
@@ -391,11 +305,6 @@ int main(void)
         }   
 
         update(); // Update the game logic
-
-        rand++; //Increasing value that resets when overflows. Used to create random seed for maps
-        if (rand >= 255){
-            rand = 0;
-        }
 
         ++render_time;
     }

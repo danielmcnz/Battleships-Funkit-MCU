@@ -14,8 +14,18 @@
 
 #include "defs.h"
 
+
 /** Updates the player (cursor) position */
 void update_player(void);
+
+
+/** Checks if there are any ships without being fully hit. 
+ *  @param  friendly_ships array map of friendly ship locations
+ *  @param  enemy_guesses array map of all guesses from the opposing player
+ *  @return 1 if enemy guesses fully encapulates friendly ships, else 0
+ */
+uint8_t has_player_won(uint8_t friendly_ships[], uint8_t enemy_guesses[]);
+
 
 /** Gets player coordinates
  * @return position vector containing (x, y) coordinates of player

@@ -8,7 +8,7 @@
 #include "renderer.h"
 
 
-void renderer_init()
+void renderer_init(void)
 {
     tinygl_init(DISPLAY_RATE);
     tinygl_font_set(&font3x5_1);

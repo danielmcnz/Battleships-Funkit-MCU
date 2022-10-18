@@ -8,7 +8,7 @@
 #include "packet.h"
 
 
-void packet_init()
+void packet_init(void)
 {
     ir_uart_init();
 }

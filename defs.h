@@ -16,6 +16,9 @@
 #define BATTLESHIPS {2, 2, 3, 4}
 #define MAX_SHIPS 4
 
+/** number of possible starting locations for battleships */
+#define N_SHIP_MAPS 3
+
 
 typedef struct
 {

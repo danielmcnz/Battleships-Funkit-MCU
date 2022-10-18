@@ -7,20 +7,13 @@
 
 #pragma once
 
+
 #include <stdint.h>
 
 #include <ir_uart.h>
 
 #include "defs.h"
 
-/** coordinates structure */
-typedef struct
-{
-    /** x coordinate */
-    uint8_t x;
-    /** y coordinate */
-    uint8_t y;
-} coords_t;
 
 /** packet structure for IR comms */
 typedef struct
@@ -28,11 +21,11 @@ typedef struct
     /** Whether attack/defend was a hit or miss */
     uint8_t result;
     /** coordinates structure */
-    coords_t coords;
+    pos_t coords;
 } packet_t;
 
 
-void packet_init();
+void packet_init(void);
 
 
 /** Handles ir communications in attack mode

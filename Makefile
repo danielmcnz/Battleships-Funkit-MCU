@@ -20,7 +20,7 @@ all: game.out
 # --------------------------------------------
 # Src
 
-game.o: game.c defs.h starting_positions.h player.h renderer.h packet.h ../../drivers/avr/system.h ../../fonts/font3x5_1.h ../../drivers/button.h ../../drivers/display.h ../../drivers/navswitch.h ../../fonts/font5x7_1.h ../../utils/font.h ../../utils/pacer.h ../../utils/tinygl.h ../../drivers/avr/ir_uart.h
+game.o: game.c defs.h player.h renderer.h packet.h map.h random.h ../../drivers/avr/system.h ../../fonts/font3x5_1.h ../../drivers/button.h ../../drivers/display.h ../../drivers/navswitch.h ../../fonts/font5x7_1.h ../../utils/font.h ../../utils/pacer.h ../../utils/tinygl.h ../../drivers/avr/ir_uart.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 player.o: player.c defs.h ../../drivers/avr/system.h ../../drivers/navswitch.h
@@ -30,6 +30,9 @@ renderer.o: renderer.c defs.h ../../utils/tinygl.h ../../fonts/font3x5_1.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 packet.o: packet.c defs.h ../../drivers/avr/ir_uart.h
+	$(CC) -c $(CFLAGS) $< -o $@
+
+map.o: map.c defs.h random.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 # --------------------------------------------
@@ -85,7 +88,7 @@ prescale.o: ../../drivers/avr/prescale.c ../../drivers/avr/prescale.h ../../driv
 
 
 # Link: create ELF output file from object files.
-game.out: game.o player.o renderer.o packet.o pio.o system.o timer.o display.o ledmat.o font.o pacer.o tinygl.o navswitch.o button.o ir_uart.o usart1.o timer0.o prescale.o
+game.out: game.o player.o renderer.o packet.o pio.o system.o timer.o display.o ledmat.o font.o pacer.o tinygl.o navswitch.o button.o ir_uart.o usart1.o timer0.o prescale.o map.o
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 	$(SIZE) $@
 

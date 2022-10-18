@@ -14,7 +14,7 @@
 #include "defs.h"
 
 
-void renderer_init();
+void renderer_init(void);
 
 
 

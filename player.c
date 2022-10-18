@@ -7,6 +7,7 @@
 
 #include "player.h"
 
+
 static pos_t player = {0};
 
 void update_player()
@@ -53,6 +54,20 @@ void update_player()
     player.x = (uint8_t)x;
     player.y = (uint8_t)y;
 }
+
+
+uint8_t has_player_won(uint8_t friendly_ships[], uint8_t enemy_guesses[])
+{
+    for (uint8_t i=0; i<MAP_WIDTH * MAP_HEIGHT; ++i)
+    {
+        if (friendly_ships[i] == 1 && enemy_guesses[i] == 0){
+            return 0;
+        }
+
+    } 
+    return 1;
+}
+
 
 pos_t get_player(void)
 {
