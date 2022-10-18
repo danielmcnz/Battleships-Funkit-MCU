@@ -27,11 +27,12 @@ uint8_t send_coords(packet_t *packet)
     }
 
     if(recv == 1)
-        {
-            recv = 0;
-            sent_coords = 0;
-            return 1;
-        }
+    {
+        recv = 0;
+        sent_coords = 0;
+        return 1;
+    }
+
     return 0;
 }
 
@@ -56,7 +57,9 @@ uint8_t recv_coords(packet_t *packet, uint8_t friendly_ships[])
     {
         uint8_t result = friendly_ships[MAP_HEIGHT * packet->coords.x + (MAP_HEIGHT-1)-packet->coords.y];
         if(result == 0)
+        {
             result = 2;
+        }
 
         packet->result = result;
         
@@ -71,5 +74,6 @@ uint8_t recv_coords(packet_t *packet, uint8_t friendly_ships[])
         sent_coords = 0;
         return 1;
     }
+
     return 0;
 }

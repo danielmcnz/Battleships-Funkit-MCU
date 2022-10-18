@@ -35,7 +35,7 @@ void draw_pixel(uint8_t x, uint8_t y);
 /** Draws the given map array onto the board
  *  @param map array of pixel values to draw
 */
-void draw_map(uint8_t map[35]);
+void draw_map(uint8_t map[]);
 
 
 /** Clears the pixels on the board */
