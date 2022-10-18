@@ -20,10 +20,10 @@ all: game.out
 # --------------------------------------------
 # Src
 
-game.o: game.c defs.h starting_positions.h player.h renderer.h packet.h ../../drivers/avr/system.h ../../drivers/button.h ../../drivers/display.h ../../drivers/navswitch.h ../../fonts/font5x7_1.h ../../utils/font.h ../../utils/pacer.h ../../utils/tinygl.h ../../drivers/avr/ir_uart.h ../../fonts/font3x5_1.h
+game.o: game.c defs.h starting_positions.h player.h renderer.h packet.h ../../drivers/avr/system.h ../../fonts/font3x5_1.h ../../drivers/button.h ../../drivers/display.h ../../drivers/navswitch.h ../../fonts/font5x7_1.h ../../utils/font.h ../../utils/pacer.h ../../utils/tinygl.h ../../drivers/avr/ir_uart.h ../../fonts/font3x5_1.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
-player.o: player.c ../../drivers/avr/system.h ../../drivers/navswitch.h
+player.o: player.c defs.h ../../drivers/avr/system.h ../../drivers/navswitch.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 renderer.o: renderer.c defs.h ../../utils/tinygl.h

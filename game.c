@@ -2,10 +2,9 @@
 #include <navswitch.h>
 #include <pacer.h>
 #include <tinygl.h>
+#include <font3x5_1.h>
 #include <button.h>
 #include <ir_uart.h>
-
-#include <avr/io.h>
 
 #include "defs.h"
 #include "player.h"
@@ -17,6 +16,10 @@
 enum gameState
 {
     MAINMENU,
+    WIN,
+    LOSE,
+    HIT,
+    MISS,
     ATTACK,
     DEFEND,
 };
@@ -25,10 +28,61 @@ static enum gameState game_state;
 
 static int8_t buttonState = 1;
 
-uint8_t rand;
+uint8_t rand = 0;
 
 void generate_ships(uint8_t map[35])
 {
+    // uint8_t direction = rand % 2; // horizontal = 0, vertical = 1
+
+    // // pos_t boats[] = { (1, 2), (1, 3),
+    // //                     (3, 2), (3, 3),
+    // //                     (2, 1), (3, 1), (4, 1)
+    // //                 };
+
+    // pos_t boats[] = {0};
+
+    // uint8_t pixel_count = 0;
+
+    // for(uint8_t n_boat = 0; n_boat < MAX_SHIPS; ++n_boat)
+    // {
+    //     for(uint8_t n_pixel = 1; n_pixel < BATTLESHIPS[n_boat]; ++n_pixel)
+    //     {
+    //         if(n_pixel == 0)
+    //         {
+    //             if(direction == 0)
+    //             {
+    //                 boats[pixel_count + n_pixel].x = rand % (MAP_HEIGHT + 1 - BATTLESHIPS[n_boat]);
+    //                 boats[pixel_count + n_pixel].y = rand % (MAP_WIDTH + 1);
+    //             }
+    //             else
+    //             {
+    //                 boats[pixel_count + n_pixel].x = rand % (MAP_WIDTH + 1);
+    //                 boats[pixel_count + n_pixel].y = rand % (MAP_HEIGHT + 1 - BATTLESHIPS[n_boat]);
+    //             }
+    //         }
+    //         else
+    //         {
+    //             if(direction == 0)
+    //             {
+    //                 boats[pixel_count + n_pixel].x = boats[pixel_count + n_pixel-1].x++;
+    //             }
+    //             else
+    //             {
+    //                 boats[pixel_count + n_pixel].y = boats[pixel_count + n_pixel-1].y++;
+    //             }
+    //         }
+
+    //         ++pixel_count;
+    //     }
+
+        
+    // }
+
+    // fill map
+
+
+
+
     uint8_t *location = locations[rand % 3];
 
     // fill map
@@ -65,15 +119,6 @@ static uint8_t friendlyGuesses[] =
     0, 0, 0, 0, 0, 0, 0,
 };
 
-static uint8_t mainmenu[] =
-{
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 1, 1, 1, 1, 1, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-};
-
 
 int Has_Player_Won(void)
 {
@@ -96,13 +141,17 @@ void initialize(void)
 {
     system_init();
 
-    tinygl_init(PACER_RATE);
+    tinygl_init(DISPLAY_RATE);
+    tinygl_font_set(&font3x5_1);
+    tinygl_text_mode_set(TINYGL_TEXT_MODE_SCROLL);
+    tinygl_text_dir_set(TINYGL_TEXT_DIR_ROTATE);
+    tinygl_text_speed_set(MESSAGE_RATE);
+
     pacer_init(PACER_RATE);
 
     button_init();
 
     ir_uart_init();
-    DDRC |= (1<<2);
 }
 
 void update(void)
@@ -191,15 +240,24 @@ void update(void)
     
 }
 
+
 void render(void)
 {
     tinygl_update();
-    draw_clear();
 
+    if(game_state > MISS)
+        draw_clear();
+
+    static uint8_t title_set = 0;
+    
     switch(game_state)
     {
         case MAINMENU:
-            draw_map(mainmenu);
+            if(!title_set)
+            {
+                tinygl_text("BATTLESHIPS");
+                title_set = 1;
+            }
             break;
         case ATTACK:
             if(buttonState == 1)
@@ -218,13 +276,14 @@ void render(void)
             else
                 draw_map(enemyGuesses);
             break;
-    };   
+    };
 }
 
-int main (void)
+int main(void)
 { 
-    
     initialize();
+
+    uint8_t render_time = 0;
 
     game_state = MAINMENU;
 
@@ -232,13 +291,20 @@ int main (void)
     {
         pacer_wait ();
 
-        render();     
-        update(); 
+        if(render_time == PACER_RATE / DISPLAY_RATE)
+        {
+            render(); 
+            render_time = 0; 
+        }   
+
+        update();
+
         rand++;
         if (rand >= 255){
             rand = 0;
-
         }
+
+        ++render_time;
     }
 
     return 0;

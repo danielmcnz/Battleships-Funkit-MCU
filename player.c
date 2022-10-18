@@ -1,6 +1,6 @@
 #include "player.h"
 
-static player_t player = (player_t) {.x=0, .y=0};
+static pos_t player = {0};
 
 void update_player()
 {
@@ -42,7 +42,7 @@ void update_player()
     player.y = (uint8_t)y;
 }
 
-player_t get_player(void)
+pos_t get_player(void)
 {
     return player;
 }
