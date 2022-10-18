@@ -36,7 +36,7 @@ enum gameState
 static enum gameState prev_game_state;
 static enum gameState game_state;
 
-static int8_t buttonState = 1;
+static int8_t TopButton = 1;
 
 uint8_t rand = 0;
 
@@ -199,7 +199,7 @@ void update(void)
             if(navswitch_push_event_p(NAVSWITCH_PUSH)) //Updating nav pressed down
                 nav_push_down = 1;
 
-            if (nav_push_down == 1 && buttonState == 1) { //If a shot is fired, get X/Y position of cursor
+            if (nav_push_down == 1 && TopButton == 1) { //If a shot is fired, get X/Y position of cursor
                 packet.coords.x = get_player().x;
                 packet.coords.y = get_player().y;
                 
@@ -209,7 +209,7 @@ void update(void)
                 if(recv == 1)
                 {
                     
-                    update_map(packet.coords, friendlyGuesses, packet.result); //Update Maps
+                    update_map(packet.coords, friendlyGuesses, packet.result); //Update Map
                     
                     /** @todo GAME WINNING
                     */
@@ -231,16 +231,16 @@ void update(void)
             
             break;
         case DEFEND:
-            // Receive X/Y coords
-            recv = recv_coords(&packet, friendlyShips);
+            
+            recv = recv_coords(&packet, friendlyShips); // Receive X&Y coords of attack fire. Sets recv to 1 if 
             
             if(recv == 1)
             {
-                //Update Matricies
-                update_map(packet.coords, enemyGuesses, packet.result);
+                
+                update_map(packet.coords, enemyGuesses, packet.result); //Update Map
 
-                // Check if enenmy guesses overlaps with friendly ships, game win if matches
-                // has_player_won()
+                /** @todo GAME WINNING
+                                    */
 
                 game_state = ATTACK;
                 prev_game_state = game_state;
@@ -255,27 +255,26 @@ void update(void)
             }
             break;
         case MAIN_MENU:
-            // if receive 1, defend, else if push pio, attack and send defend to other player
-            if(ir_uart_read_ready_p())
+            
+            if(ir_uart_read_ready_p()) // Wait until receive '1',  as other player has pressed button first. Therefore set to Defend.
             {
                 if(ir_uart_getc() == 1)
                 {
-                    game_state = DEFEND;
+                    game_state = DEFEND; 
                     generate_ships(friendlyShips);
                 }
             }
             else
             {
-                if(navswitch_push_event_p(NAVSWITCH_PUSH))
+                if(navswitch_push_event_p(NAVSWITCH_PUSH)) //Send '1' to other player, telling them to defend and you set to attack first. 
                 {
                     game_state = ATTACK;
                     generate_ships(friendlyShips);
-
-                    // transmit 1 as enemy defend
                     ir_uart_putc(1);
                 }
             }
             break;
+
         case HIT:
             if(time >= PACER_RATE * 4)
             {
@@ -299,13 +298,14 @@ void update(void)
     }
 
 
-    if(button_push_event_p(BUTTON1))
-        buttonState = -buttonState;
+    if(button_push_event_p(BUTTON1)) //Update top button toggle, which is used in the renderer function to update screen/ 
+        TopButton = -TopButton;
 
     
 }
 
-
+/**Deterimes what to draw to the screen
+*/
 void render(void)
 {
     tinygl_update();
@@ -321,27 +321,27 @@ void render(void)
     
     switch(game_state)
     {
-        case ATTACK:
-            if(buttonState == 1)
+        case ATTACK: //ATTACK MODE
+            if(TopButton == 1) 
             {
-                draw_map(friendlyGuesses);
-                draw_flashing_pixel(get_player().x, get_player().y);
+                draw_map(friendlyGuesses); //If top Button toggled to one, draw your guesses map
+                draw_flashing_pixel(get_player().x, get_player().y); //Draw 'aiming' cursor over top
             }
             else
-                draw_map(enemyGuesses);
+                draw_map(enemyGuesses); //If top Button toggled to 0, draw enemy guesses map
             break;
-        case DEFEND:
-            if(buttonState == 1)
+        case DEFEND: //DEFEND MODE
+            if(TopButton == 1)
             {
-                draw_map(friendlyShips);
+                draw_map(friendlyShips); //If top Button toggled to one, draw your ships map
             } 
             else
-                draw_map(enemyGuesses);
+                draw_map(enemyGuesses); //If top Button toggled to 0, draw enemy guesses map
             break;
-        case MAIN_MENU:
+        case MAIN_MENU: //MAIN MENU
             if(!title_set)
             {
-                tinygl_text("BATTLESHIPS");
+                tinygl_text("BATTLESHIPS"); //Draw main scroll
                 title_set = 1;
             }
             break;
@@ -375,28 +375,29 @@ void render(void)
             break;
     };
 }
-
+/**Main Loop, all major functions are called here
+*/
 int main(void)
 { 
-    initialize();
+    initialize(); //Initalise everything
 
     uint8_t render_time = 0;
 
-    game_state = MAIN_MENU;
+    game_state = MAIN_MENU; //Set gamestate to main menu to start 
 
     while (1)
     {
         pacer_wait ();
 
-        if(render_time == PACER_RATE / DISPLAY_RATE)
+        if(render_time == PACER_RATE / DISPLAY_RATE) //Draw screen at slower rate than game logic updates as it is not needed to very fast.
         {
             render(); 
             render_time = 0; 
         }   
 
-        update();
+        update(); // Update the game logic
 
-        rand++;
+        rand++; //Increasing value that resets when overflows. Used to create random seed for maps
         if (rand >= 255){
             rand = 0;
         }
