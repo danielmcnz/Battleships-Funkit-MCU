@@ -29,7 +29,7 @@ player.o: player.c defs.h ../../drivers/avr/system.h ../../drivers/navswitch.h
 renderer.o: renderer.c defs.h ../../utils/tinygl.h ../../fonts/font3x5_1.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
-packet.o: packet.c defs.h ../../drivers/avr/ir_uart.h
+packet.o: packet.c defs.h map.h ../../drivers/avr/ir_uart.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 map.o: map.c defs.h random.h
