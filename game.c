@@ -24,6 +24,7 @@ enum gameState
     DEFEND,
 };
 
+static enum gameState prev_game_state;
 static enum gameState game_state;
 
 static int8_t buttonState = 1;
@@ -167,8 +168,68 @@ void update(void)
 
     static uint8_t button_pushed = 0;
 
+    static uint16_t time = 0;
+
     switch(game_state)
     {
+        case ATTACK:
+            if(navswitch_push_event_p(NAVSWITCH_PUSH))
+                button_pushed = 1;
+
+            if (button_pushed == 1 && buttonState == 1) { 
+                packet.coords.x = get_player().x;
+                packet.coords.y = get_player().y;
+                
+                //SEND X/Y coords
+                recv = send_coords(&packet);
+                
+                if(recv == 1)
+                {
+                    //Update Matricies
+                    update_map(packet.coords, friendlyGuesses, packet.result);
+                    
+                    //Check if enenmy guesses overlaps with friendly ships, game win if matches
+                    
+                    game_state = DEFEND;
+                    prev_game_state = game_state;
+                    if(packet.result == 1)
+                    {
+                        game_state = HIT;
+                    }
+                    else
+                    {
+                        game_state = MISS;
+                    }
+
+                    button_pushed = 0;                    
+                }
+            }
+            
+            break;
+        case DEFEND:
+            // Receive X/Y coords
+            recv = recv_coords(&packet, friendlyShips);
+            
+            if(recv == 1)
+            {
+                //Update Matricies
+                update_map(packet.coords, enemyGuesses, packet.result);
+
+                // Check if enenmy guesses overlaps with friendly ships, game win if matches
+                // Has_Player_Won()
+
+                game_state = ATTACK;
+                prev_game_state = game_state;
+                if(packet.result == 1)
+                {
+                    game_state = HIT;
+                }
+                else
+                {
+                    game_state = MISS;
+                }
+            }
+            break;
         case MAINMENU:
             // if receive 1, defend, else if push pio, attack and send defend to other player
             if(ir_uart_read_ready_p())
@@ -191,45 +252,25 @@ void update(void)
                 }
             }
             break;
-        case ATTACK:
-            if(navswitch_push_event_p(NAVSWITCH_PUSH))
-                button_pushed = 1;
-
-            if (button_pushed == 1 && buttonState == 1) { 
-                packet.coords.x = get_player().x;
-                packet.coords.y = get_player().y;
-                
-                //SEND X/Y coords
-                recv = send_coords(&packet);
-                
-                if(recv == 1)
-                {
-                    //Update Matricies
-                    update_map(packet.coords, friendlyGuesses, packet.result);
-                    
-                    //Check if enenmy guesses overlaps with friendly ships, game win if matches
-                    game_state = DEFEND;
-
-                    button_pushed = 0;                    
-                }
-            }
-            
-            break;
-        case DEFEND:
-            // Receive X/Y coords
-            recv = recv_coords(&packet, friendlyShips);
-            
-            if(recv == 1)
+        case HIT:
+            if(time >= PACER_RATE * 4)
             {
-                //Update Matricies
-                update_map(packet.coords, enemyGuesses, packet.result);
-
-                // Check if enenmy guesses overlaps with friendly ships, game win if matches
-                // Has_Player_Won();
-
-                // GameState = Attack
-                game_state = ATTACK;
+                time = 0;
+                game_state = prev_game_state;
             }
+            time++;
+            break;
+        case MISS:
+            if(time >= PACER_RATE * 4)
+            {
+                time = 0;
+                game_state = prev_game_state;
+            }
+            time++;
+            break;
+        case WIN:
+            break;
+        case LOSE:
             break;
     }
 
@@ -249,16 +290,13 @@ void render(void)
         draw_clear();
 
     static uint8_t title_set = 0;
+    static uint8_t hit_set = 0;
+    static uint8_t miss_set = 0;
+    static uint8_t win_set = 0;
+    static uint8_t lose_set = 0;
     
     switch(game_state)
     {
-        case MAINMENU:
-            if(!title_set)
-            {
-                tinygl_text("BATTLESHIPS");
-                title_set = 1;
-            }
-            break;
         case ATTACK:
             if(buttonState == 1)
             {
@@ -275,6 +313,41 @@ void render(void)
             } 
             else
                 draw_map(enemyGuesses);
+            break;
+        case MAINMENU:
+            if(!title_set)
+            {
+                tinygl_text("BATTLESHIPS");
+                title_set = 1;
+            }
+            break;
+        case HIT:
+            if(!hit_set)
+            {
+                tinygl_text("HIT");
+                hit_set = 1;
+            }
+            break;
+        case MISS:
+            if(!miss_set)
+            {
+                tinygl_text("MISS");
+                miss_set = 1;
+            }
+            break;
+        case WIN:
+            if(!win_set)
+            {
+                tinygl_text("YOU WON");
+                win_set = 1;
+            }
+            break;
+        case LOSE:
+            if(!lose_set)
+            {
+                tinygl_text("YOU LOSE");
+                lose_set = 1;
+            }
             break;
     };
 }
