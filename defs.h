@@ -1,7 +1,7 @@
 #pragma once
 
-#define PACER_RATE 900
-#define DISPLAY_RATE 450
+#define PACER_RATE 800
+#define DISPLAY_RATE 600
 
 #define MESSAGE_RATE 10
 

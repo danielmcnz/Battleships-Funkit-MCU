@@ -17,11 +17,9 @@ void packet_init() //Initalise UART libary
 
 uint8_t send_coords(packet_t *packet)
 {
-    static uint8_t sent_result = 0; // Variable track if sent coords
     static uint8_t received_value= 0; //Variable to track if received result
+    static uint8_t sent_result = 0; // Variable track if sent coords
 
-    
-    
     if(sent_result == 0 && ir_uart_write_ready_p()) //If coords havnt been sent, wait until transmitter is ready and send X/Y coords
     {
         ir_uart_putc(packet->coords.x + packet->coords.y * 10); //Coordernates are sent as a two digit number in YX order. Eg 35 is X=5, Y=3. 
@@ -48,8 +46,6 @@ uint8_t send_coords(packet_t *packet)
 uint8_t recv_coords(packet_t *packet, uint8_t friendly_ships[])
 {
     static uint8_t received_value= 0; // Variable track if coords recveived
-    
-
     static uint8_t sent_result = 0; //Variable to check if result has been sent
 
     

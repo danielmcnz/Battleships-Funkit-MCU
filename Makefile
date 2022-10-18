@@ -26,7 +26,7 @@ game.o: game.c defs.h player.h renderer.h packet.h map.h random.h ../../drivers/
 player.o: player.c defs.h ../../drivers/avr/system.h ../../drivers/navswitch.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
-renderer.o: renderer.c defs.h ../../utils/tinygl.h ../../fonts/font3x5_1.h
+renderer.o: renderer.c defs.h map.h ../../utils/tinygl.h ../../fonts/font3x5_1.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 packet.o: packet.c defs.h map.h ../../drivers/avr/ir_uart.h

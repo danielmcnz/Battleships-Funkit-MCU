@@ -12,6 +12,7 @@
 #include <font3x5_1.h>
 
 #include "defs.h"
+#include "map.h"
 
 
 /** initializes renderer module */

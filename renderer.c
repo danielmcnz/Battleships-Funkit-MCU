@@ -39,13 +39,14 @@ void draw_flashing_pixel(uint8_t x, uint8_t y)
 
 void draw_dimmed_pixel(uint8_t x, uint8_t y)
 {
-    static uint8_t time = 0;
+    static uint16_t time = 0;
 
     tinygl_point_t point = {.x=x, .y=y};
-    if(time >= DIMMED_FREQUENCY)
+    if(time >= FLASHING_RATE/4)
     {
         tinygl_draw_point(point, 1);
-        time = 0;
+        if(time == FLASHING_RATE/2)
+            time = 0;
     } 
     else 
     {
@@ -66,7 +67,7 @@ void draw_map(uint8_t map[])
     {
         for(uint8_t y=0; y<MAP_HEIGHT; ++y)
         {
-            switch(map[MAP_HEIGHT * x + (MAP_HEIGHT-1)-y])
+            switch(get_position_value(map, (pos_t){.x=x, .y=y}))
             {
                 case 1:
                     draw_pixel(x, y);

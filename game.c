@@ -43,6 +43,15 @@ uint8_t enemy_guesses[] =
 };
 
 
+// uint8_t friendly_guesses[] =
+// {
+//     0, 0, 0, 0, 0, 0, 2,
+//     0, 0, 0, 0, 2, 2, 0,
+//     0, 0, 0, 2, 2, 0, 2,
+//     0, 0, 0, 0, 1, 0, 0,
+//     0, 0, 0, 0, 0, 0, 0,
+// };
+
 uint8_t friendly_guesses[] =
 {
     0, 0, 0, 0, 0, 0, 0,
@@ -218,7 +227,7 @@ void update(void)
 void render(void)
 {
     tinygl_update();
-
+        
     if(game_state > MISS)
         draw_clear();
 
@@ -284,8 +293,7 @@ void render(void)
             break;
     };
 }
-/**Main Loop, all major functions are called here
-*/
+/** Main Loop, all major functions are called here */
 int main(void)
 { 
     initialize(); //Initalise everything
@@ -297,6 +305,7 @@ int main(void)
     while (1)
     {
         pacer_wait ();
+        update(); // Update the game logic
 
         if(render_time == PACER_RATE / DISPLAY_RATE) //Draw screen at slower rate than game logic updates as it is not needed to very fast.
         {
@@ -304,7 +313,7 @@ int main(void)
             render_time = 0; 
         }   
 
-        update(); // Update the game logic
+        
 
         ++render_time;
     }
