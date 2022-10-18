@@ -86,8 +86,8 @@ int Has_Player_Won()
     return 1;
 }
 
-void update_map(player_t player, uint8_t Map[], uint8_t RESULT){
-    Map[MAP_HEIGHT * player.x + (MAP_HEIGHT-1)-player.y] = RESULT;
+void update_map(coords_t coords, uint8_t Map[], uint8_t RESULT){
+    Map[MAP_HEIGHT * coords.x + (MAP_HEIGHT - 1) - coords.y] = RESULT;
 }
 
 
@@ -155,14 +155,12 @@ void update(void)
                 if(recv == 1)
                 {
                     //Update Matricies
-                    update_map(get_player(), friendlyGuesses, packet.result);
+                    update_map(packet.coords, friendlyGuesses, packet.result);
                     
                     //Check if enenmy guesses overlaps with friendly ships, game win if matches
                     game_state = DEFEND;
 
-                    button_pushed = 0;
-
-                    
+                    button_pushed = 0;                    
                 }
             }
             
@@ -174,10 +172,10 @@ void update(void)
             if(recv == 1)
             {
                 //Update Matricies
-                update_map(get_player(), enemyGuesses, packet.result);
+                update_map(packet.coords, enemyGuesses, packet.result);
 
                 // Check if enenmy guesses overlaps with friendly ships, game win if matches
-                Has_Player_Won();
+                // Has_Player_Won();
 
                 // GameState = Attack
                 game_state = ATTACK;

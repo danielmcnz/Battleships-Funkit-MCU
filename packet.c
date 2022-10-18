@@ -28,6 +28,8 @@ uint8_t recv_coords(packet_t *packet, uint8_t friendly_ships[])
 {
     static uint8_t recv = 0;
 
+    static uint8_t sent_coords = 0;
+
     // receive enemy attack coordinates
     if(ir_uart_read_ready_p())
     {
@@ -38,7 +40,7 @@ uint8_t recv_coords(packet_t *packet, uint8_t friendly_ships[])
     }
 
     // send hit or miss dependent on coordinates
-    if (recv == 1) 
+    if (recv == 1 && sent_coords == 0 && ir_uart_write_ready_p()) 
     {
         uint8_t result = friendly_ships[MAP_HEIGHT * packet->coords.x + (MAP_HEIGHT-1)-packet->coords.y];
         if(result == 0)
@@ -48,8 +50,10 @@ uint8_t recv_coords(packet_t *packet, uint8_t friendly_ships[])
         
         ir_uart_putc(result);
         // PORTC |= (1 << 2);
+
+        sent_coords = 1;
     }
     
     
-    return recv;
+    return sent_coords;
 }
