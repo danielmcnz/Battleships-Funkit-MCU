@@ -30,6 +30,7 @@ uint8_t rand;
 void generate_ships(uint8_t map[35])
 {
     uint8_t *location = locations[rand % 3];
+
     // fill map
     for (uint8_t i=0; i<MAP_WIDTH * MAP_HEIGHT; ++i)
     {
@@ -74,7 +75,7 @@ static uint8_t mainmenu[] =
 };
 
 
-int Has_Player_Won()
+int Has_Player_Won(void)
 {
     for (uint8_t i=0; i<MAP_WIDTH * MAP_HEIGHT; ++i)
     {
