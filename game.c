@@ -137,7 +137,12 @@ void update(void)
             }
             break;
         case ATTACK:
-            if (navswitch_push_event_p(NAVSWITCH_PUSH) && buttonState == 1) { 
+            static uint8_t button_pushed = 0;
+
+            if(navswitch_push_event_p(NAVSWITCH_PUSH))
+                button_pushed = 1;
+
+            if (button_pushed == 1 && buttonState == 1) { 
                 packet.coords.x = get_player().x;
                 packet.coords.y = get_player().y;
                 
@@ -151,6 +156,8 @@ void update(void)
                     
                     //Check if enenmy guesses overlaps with friendly ships, game win if matches
                     game_state = DEFEND;
+
+                    button_pushed = 0;
                 }
             }
             
