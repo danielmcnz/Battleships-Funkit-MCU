@@ -192,14 +192,14 @@ void update(void)
                     
                     game_state = DEFEND;
                     prev_game_state = game_state;
-                    if(packet.result == 1)
-                    {
-                        game_state = HIT;
-                    }
-                    else
-                    {
-                        game_state = MISS;
-                    }
+                    // if(packet.result == 1)
+                    // {
+                    //     game_state = HIT;
+                    // }
+                    // else
+                    // {
+                    //     game_state = MISS;
+                    // }
 
                     button_pushed = 0;                    
                 }
@@ -220,14 +220,14 @@ void update(void)
 
                 game_state = ATTACK;
                 prev_game_state = game_state;
-                if(packet.result == 1)
-                {
-                    game_state = HIT;
-                }
-                else
-                {
-                    game_state = MISS;
-                }
+                // if(packet.result == 1)
+                // {
+                //     game_state = HIT;
+                // }
+                // else
+                // {
+                //     game_state = MISS;
+                // }
             }
             break;
         case MAINMENU:
