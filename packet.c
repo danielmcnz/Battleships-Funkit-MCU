@@ -6,8 +6,7 @@ uint8_t send_coords(packet_t *packet)
 {
     recv = 0;
 
-    ir_uart_putc(packet->coords.x);
-    ir_uart_putc(packet->coords.y);
+    ir_uart_putc(packet->coords.x + packet->coords.y * 10);
 
     if(ir_uart_read_ready_p())
     {
@@ -21,19 +20,14 @@ uint8_t send_coords(packet_t *packet)
 uint8_t recv_coords(packet_t *packet, uint8_t friendly_ships[])
 {
     recv = 0;
-    static uint8_t updated = 0;
 
     // receive enemy attack coordinates
-    if(ir_uart_read_ready_p() && updated != 1)
+    if(ir_uart_read_ready_p())
     {
-        packet->coords.x = ir_uart_getc();
-        updated = 1;
-    }
-    if(ir_uart_read_ready_p() && updated == 1)
-    {
-        packet->coords.y = ir_uart_getc();
+        uint8_t in_val = ir_uart_getc();
+        packet->coords.x = in_val % 10;
+        packet->coords.y = (in_val - packet->coords.x) / 10;
         recv = 1;
-        updated = 0;
     }
 
     // send hit or miss dependent on coordinates
