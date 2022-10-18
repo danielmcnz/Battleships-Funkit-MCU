@@ -13,15 +13,21 @@
 
 #include "defs.h"
 
+/** coordinates structure */
 typedef struct
 {
+    /** x coordinate */
     uint8_t x;
+    /** y coordinate */
     uint8_t y;
 } coords_t;
 
+/** packet structure for IR comms */
 typedef struct
 {
-    uint8_t result; // whether attack/defend was a hit or miss
+    /** Whether attack/defend was a hit or miss */
+    uint8_t result;
+    /** coordinates structure */
     coords_t coords;
 } packet_t;
 

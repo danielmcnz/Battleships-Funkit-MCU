@@ -14,6 +14,10 @@
 
 #include "defs.h"
 
+/** Updates the player (cursor) position */
 void update_player(void);
 
+/** Gets player coordinates
+ * @return position vector containing (x, y) coordinates of player
+*/
 pos_t get_player(void);

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <stdint.h>
 
 #define AMOUNT_OF_MAPS 3
