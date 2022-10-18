@@ -3,5 +3,8 @@
 *.hex
 *.out
 
+# Misc files
+*.json
+
 # Folders
 **/.vscode/
