@@ -6,6 +6,7 @@
  */
 
 #include "packet.h"
+#include "map.h"
 
 
 void packet_init() //Initalise UART libary
@@ -16,18 +17,18 @@ void packet_init() //Initalise UART libary
 
 uint8_t send_coords(packet_t *packet)
 {
-    static uint8_t sent_coords = 0; // Variable track if sent coords
+    static uint8_t sent_result = 0; // Variable track if sent coords
     static uint8_t received_value= 0; //Variable to track if received result
 
     
     
-    if(sent_coords == 0 && ir_uart_write_ready_p()) //If coords havnt been sent, wait until transmitter is ready and send X/Y coords
+    if(sent_result == 0 && ir_uart_write_ready_p()) //If coords havnt been sent, wait until transmitter is ready and send X/Y coords
     {
         ir_uart_putc(packet->coords.x + packet->coords.y * 10); //Coordernates are sent as a two digit number in YX order. Eg 35 is X=5, Y=3. 
-        sent_coords = 1;
+        sent_result = 1;
     }
 
-    if(ir_uart_read_ready_p() && sent_coords == 1 && received_value== 0)//If coords have been sent, and result has not been received, wait until transmitter is ready and receive result
+    if(ir_uart_read_ready_p() && sent_result == 1 && received_value== 0)//If coords have been sent, and result has not been received, wait until transmitter is ready and receive result
     {
         packet->result = ir_uart_getc();
         received_value= 1;
@@ -36,7 +37,7 @@ uint8_t send_coords(packet_t *packet)
     if(received_value== 1) 
     {
         received_value= 0;
-        sent_coords = 0;
+        sent_result = 0;
         return 1; //Return 1 when both result has been received and coords sent
     }
 
@@ -61,9 +62,9 @@ uint8_t recv_coords(packet_t *packet, uint8_t friendly_ships[])
     }
 
     
-    if (received_value== 1 && sent_coords == 0 && ir_uart_write_ready_p()) 
+    if (received_value== 1 && sent_result == 0 && ir_uart_write_ready_p()) 
     {
-        uint8_t result = friendly_ships[MAP_HEIGHT * packet->coords.x + (MAP_HEIGHT-1)-packet->coords.y]; // send hit or miss dependent on coordinates
+        uint8_t result = get_position_value(friendly_ships, packet->coords); // send hit or miss dependent on coordinates
         if(result == 0) //If a miss is sent, change result to 2, as this is what the map uses to render a miss
         {
             result = 2;
@@ -73,13 +74,13 @@ uint8_t recv_coords(packet_t *packet, uint8_t friendly_ships[])
         
         ir_uart_putc(result); //Send result back to other player
 
-        sent_coords = 1;
+        sent_result = 1;
     }
 
-    if(sent_coords == 1)
+    if(sent_result == 1)
     {
         received_value= 0;
-        sent_coords = 0;
+        sent_result = 0;
         return 1; //Return 1 when both result has been received and coords sent
     }
 
