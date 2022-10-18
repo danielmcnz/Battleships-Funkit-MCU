@@ -47,7 +47,7 @@ uint8_t recv_coords(packet_t *packet, uint8_t friendly_ships[])
         packet->result = result;
         
         ir_uart_putc(result);
-        PORTC |= (1 << 2);
+        // PORTC |= (1 << 2);
     }
     
     

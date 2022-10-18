@@ -7,8 +7,8 @@
 
 typedef struct
 {
-    int8_t x;
-    int8_t y;
+    uint8_t x;
+    uint8_t y;
 } player_t;
 
 void update_player(void);
