@@ -5,6 +5,8 @@
 #include <button.h>
 #include <ir_uart.h>
 
+#include <avr/io.h>
+
 #include "defs.h"
 #include "player.h"
 #include "renderer.h"
@@ -99,6 +101,7 @@ void initialize(void)
     button_init();
 
     ir_uart_init();
+    DDRC |= (1<<2);
 }
 
 void update(void)
@@ -111,6 +114,8 @@ void update(void)
     packet_t packet = {0};
 
     static uint8_t recv = 0;
+
+    static uint8_t button_pushed = 0;
 
     switch(game_state)
     {
@@ -137,8 +142,6 @@ void update(void)
             }
             break;
         case ATTACK:
-            static uint8_t button_pushed = 0;
-
             if(navswitch_push_event_p(NAVSWITCH_PUSH))
                 button_pushed = 1;
 
