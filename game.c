@@ -5,6 +5,7 @@
  *  @brief  Battleships main game logic
  */
 
+//Include for C & UCFunkit supplied modules
 #include <system.h>
 #include <navswitch.h>
 #include <pacer.h>
@@ -13,6 +14,7 @@
 #include <button.h>
 #include <ir_uart.h>
 
+// Custom Modules
 #include "defs.h"
 #include "player.h"
 #include "renderer.h"
@@ -103,6 +105,8 @@ void generate_ships(uint8_t map[35])
     }
 }
 
+
+//Creating arrays which will become maps
 static uint8_t friendlyShips[] = 
 {
     0, 0, 0, 0, 0, 0, 0,
@@ -130,7 +134,8 @@ static uint8_t friendlyGuesses[] =
     0, 0, 0, 0, 0, 0, 0,
 };
 
-
+//Loops through both enenemy and friendly guesses and checks if there are any ships without being fully hit. 
+//Returns 1 if enemy guesses fully encapulates friendly ships
 int has_player_won(void)
 {
     for (uint8_t i=0; i<MAP_WIDTH * MAP_HEIGHT; ++i)
@@ -143,11 +148,18 @@ int has_player_won(void)
     return 1;
 }
 
+
+/** Updates a map 
+ *  @param coords X/Y coordernate struct, 
+ *  @param Map Map that needs to be updated
+ *  @param RESULT The value to be written (0 = No guess/off, 1 = Hit/Fully on, 2 = Miss/Dimmed)
+*/
 void update_map(coords_t coords, uint8_t Map[], uint8_t RESULT){
     Map[MAP_HEIGHT * coords.x + (MAP_HEIGHT - 1) - coords.y] = RESULT;
 }
 
-
+/**Initialising various modules
+*/
 void initialize(void)
 {
     system_init();
@@ -165,42 +177,44 @@ void initialize(void)
     ir_uart_init();
 }
 
+/**Updates the internal game logic
+*/
 void update(void)
 {
     navswitch_update();
     button_update();
-    
     update_player();
 
     packet_t packet = {0};
 
     static uint8_t recv = 0;
 
-    static uint8_t button_pushed = 0;
+    static uint8_t nav_push_down = 0; //Has the navswitch button been pressed down
 
     static uint16_t time = 0;
 
     switch(game_state)
     {
-        case ATTACK:
-            if(navswitch_push_event_p(NAVSWITCH_PUSH))
-                button_pushed = 1;
+        case ATTACK: //ATTACK SCREEN GAME LOGIC
+            if(navswitch_push_event_p(NAVSWITCH_PUSH)) //Updating nav pressed down
+                nav_push_down = 1;
 
-            if (button_pushed == 1 && buttonState == 1) { 
+            if (nav_push_down == 1 && buttonState == 1) { //If a shot is fired, get X/Y position of cursor
                 packet.coords.x = get_player().x;
                 packet.coords.y = get_player().y;
                 
-                //SEND X/Y coords
-                recv = send_coords(&packet);
+                
+                recv = send_coords(&packet); //Send X&Y coords. Packet.result gets updated with hit or miss
                 
                 if(recv == 1)
                 {
-                    //Update Matricies
-                    update_map(packet.coords, friendlyGuesses, packet.result);
                     
-                    //Check if enenmy guesses overlaps with friendly ships, game win if matches
+                    update_map(packet.coords, friendlyGuesses, packet.result); //Update Maps
                     
-                    game_state = DEFEND;
+                    /** @todo GAME WINNING
+                    */
+                    
+                    game_state = DEFEND; //Switch to defend once fired
                     prev_game_state = game_state;
                     // if(packet.result == 1)
                     // {
@@ -211,7 +225,7 @@ void update(void)
                     //     game_state = MISS;
                     // }
 
-                    button_pushed = 0;                    
+                    nav_push_down = 0;                    
                 }
             }
             
