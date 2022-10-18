@@ -118,7 +118,7 @@ void update(void)
             // if receive 1, defend, else if push pio, attack and send defend to other player
             if(ir_uart_read_ready_p())
             {
-                if(ir_uart_getc() == 0)
+                if(ir_uart_getc() == 1)
                 {
                     game_state = DEFEND;
                     generate_ships(friendlyShips);
@@ -131,8 +131,8 @@ void update(void)
                     game_state = ATTACK;
                     generate_ships(friendlyShips);
 
-                    ir_uart_putc(1);
                     // transmit 1 as enemy defend
+                    ir_uart_putc(1);
                 }
             }
             break;
