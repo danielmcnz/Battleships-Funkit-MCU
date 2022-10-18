@@ -1,3 +1,7 @@
+# Compiling Files
 *.o
 *.hex
 *.out
+
+# Folders
+**/.vscode/
