@@ -14,8 +14,8 @@
 #include "defs.h"
 
 
+/** initializes renderer module */
 void renderer_init(void);
-
 
 
 /** Draws a flashing pixel

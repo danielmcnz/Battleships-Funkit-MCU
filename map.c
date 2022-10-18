@@ -98,3 +98,9 @@ void generate_ships(uint8_t map[35])
         map[i] = location[i];
     }
 }
+
+
+uint8_t get_position_value(uint8_t map[], pos_t position)
+{
+    return map[MAP_HEIGHT * position.x + (MAP_HEIGHT - 1 ) - position.y];
+}

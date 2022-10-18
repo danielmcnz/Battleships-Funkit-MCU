@@ -1,6 +1,9 @@
 /**
- * @param
-*/
+ *  @file   random.h
+ *  @author D. McGregor, C. Hall-Fernandez
+ *  @date   18 October 2022
+ *  @brief  Random variable module
+ */
 
 #pragma once
 
@@ -9,6 +12,7 @@
 static uint8_t _rand = 0;
 
 
+/** updated random counter */
 static inline void update_rand(void)
 {
     _rand++; //Increasing value that resets when overflows. Used to create random seed for maps
@@ -17,6 +21,9 @@ static inline void update_rand(void)
         }
 }
 
+/** Returns random counter
+ *  @return random counter variable
+*/
 static inline uint8_t rand(void)
 {
     return _rand;

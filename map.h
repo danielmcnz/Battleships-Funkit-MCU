@@ -26,3 +26,7 @@ void update_map(pos_t coords, uint8_t Map[], uint8_t RESULT);
  *  @param map friendly ships map
 */
 void generate_ships(uint8_t map[35]);
+
+
+/** @todo this */
+uint8_t get_position_value(uint8_t map[], pos_t position);

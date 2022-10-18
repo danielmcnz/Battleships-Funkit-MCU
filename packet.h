@@ -25,6 +25,7 @@ typedef struct
 } packet_t;
 
 
+/** Initialises packet module */
 void packet_init(void);
 
 
