@@ -243,7 +243,7 @@ void render(void)
             if(top_button == 1) 
             {
                 draw_map(friendly_guesses); //If top Button toggled to one, draw your guesses map
-                draw_flashing_pixel(get_player().x, get_player().y); //Draw 'aiming' cursor over top
+                draw_flashing_pixel(CURSOR_FREQUENCY, get_player().x, get_player().y); //Draw 'aiming' cursor over top
             }
             else
                 draw_map(enemy_guesses); //If top Button toggled to 0, draw enemy guesses map
@@ -280,14 +280,14 @@ void render(void)
         case WIN_SCREEN:
             if(!win_set)
             {
-                tinygl_text("YOU WON");
+                tinygl_text("W");
                 win_set = 1;
             }
             break;
         case LOSE_SCREEN:
             if(!lose_set)
             {
-                tinygl_text("YOU LOSE");
+                tinygl_text("L");
                 lose_set = 1;
             }
             break;
