@@ -51,7 +51,8 @@ uint8_t friendly_guesses[] =
     0, 0, 0, 0, 0, 0, 0,
 };
 
-static uint8_t locations[4][35] = 
+//Possible maps for game
+static uint8_t locations[N_SHIP_MAPS]][35] = 
 {
     {
         1, 0, 1, 1, 1, 1, 0,
@@ -74,13 +75,6 @@ static uint8_t locations[4][35] =
         0, 0, 0, 0, 0, 0, 0,
         0, 1, 1, 0, 0, 0, 0,
     },
-    {
-        1, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0,
-    }
 };
 
 enum gameState
@@ -154,7 +148,7 @@ void update(void)
                     prev_game_state = game_state;
 
                     
-                    if(has_player_won(locations[enemy_map_val], friendly_guesses))
+                    if(has_player_won(locations[enemy_map_val], friendly_guesses)) //Checks if player has one, sends to 'Win' screen if true 
                     {
                         game_state = WIN_SCREEN;
                     }                              
@@ -177,7 +171,7 @@ void update(void)
                 game_state = ATTACK;
                 prev_game_state = game_state;
 
-                if(has_player_won(friendly_ships, enemy_guesses))
+                if(has_player_won(friendly_ships, enemy_guesses)) //Checks if player has lost, goes to lose screen if true 
                 {
                     game_state = LOSE_SCREEN;
                 }
@@ -185,10 +179,10 @@ void update(void)
             }
             break;
         case MAIN_MENU_SCREEN:
-            if(ir_uart_read_ready_p()) // Wait until receive '1',  as other player has pressed button first. Therefore set to Defend.
+            if(ir_uart_read_ready_p()) // Wait until receive 'enemy map',  as other player has pressed button first. Therefore set to Defend.
             {
                 int8_t res = ir_uart_getc();
-                if(res > -1)
+                if(res > -1 && res < N_SHIP_MAPS) //If received enemy map, start the game. Set as defend
                 {
                     enemy_map_val = res;
                     game_state = DEFEND; 
@@ -197,10 +191,10 @@ void update(void)
             }
             else
             {
-                if(navswitch_push_event_p(NAVSWITCH_PUSH)) //Send '1' to other player, telling them to defend and you set to attack first. 
+                if(navswitch_push_event_p(NAVSWITCH_PUSH)) //Send 'Enemy Map' to other player, telling them to defend and you set to attack first. 
                 {
                     game_state = ATTACK;
-                    enemy_map_val = generate_ships(friendly_ships, locations);
+                    enemy_map_val = generate_ships(friendly_ships, locations); //Sends the enemy map value, used for checking win/loss state
                     ir_uart_putc(enemy_map_val);
                 }
             }
@@ -223,7 +217,7 @@ void render(uint16_t *time)
 {
     tinygl_update();
         
-    if(game_state > LOSE_SCREEN)
+    if(game_state > LOSE_SCREEN) //Clears screen if its an attack or defend
         draw_clear();
 
     static uint8_t title_set = 0;
@@ -257,7 +251,7 @@ void render(uint16_t *time)
             }
             break;
         case WIN_SCREEN:
-            if(!win_set)
+            if(!win_set) //Only run once when win_screen is set. Show W to player
             {
                 draw_clear();
                 tinygl_text_mode_set(TINYGL_TEXT_MODE_STEP);
@@ -266,7 +260,7 @@ void render(uint16_t *time)
             }
             break;
         case LOSE_SCREEN:
-            if(!lose_set)
+            if(!lose_set)//Only run once when lose_screen is set. Show L to player
             {
                 draw_clear();
                 tinygl_text_mode_set(TINYGL_TEXT_MODE_STEP);
@@ -296,7 +290,7 @@ int main(void)
         {
             render(&time); 
             render_time = 0; 
-            ++time;
+            ++time; //Itterate time each render tick. Used to generate the flashing lights 
         }
 
         ++render_time;
