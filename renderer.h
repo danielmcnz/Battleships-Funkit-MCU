@@ -15,22 +15,18 @@
 #include "map.h"
 
 
+
+
 /** initializes renderer module */
 void renderer_init(void);
 
 
 /** Draws a flashing pixel
+ *  @param frequency frequency to flash the pixel
  *  @param x x coordinate on the map
  *  @param y y coordinate on the map
 */
-void draw_flashing_pixel(uint8_t x, uint8_t y);
-
-
-/** Draws a dimmed pixel
- *  @param x x coordinate on the map
- *  @param y y coordinate on the map
-*/
-void draw_dimmed_pixel(uint8_t x, uint8_t y);
+void draw_flashing_pixel(uint8_t frequency, uint8_t x, uint8_t y);
 
 
 /** Draws a pixel

@@ -5,8 +5,8 @@
 
 #define MESSAGE_RATE 10
 
-#define FLASHING_RATE PACER_RATE / 2
-#define DIMMED_FREQUENCY 3
+#define CURSOR_FREQUENCY PACER_RATE / 2
+#define MISS_FREQUENCY CURSOR_FREQUENCY / 2
 
 #define MAP_WIDTH 5
 #define MAP_HEIGHT 7
@@ -18,6 +18,11 @@
 
 /** number of possible starting locations for battleships */
 #define N_SHIP_MAPS 3
+
+#define HIGH 1
+#define LOW 0
+#define HIT 1
+#define MISS 2
 
 
 /** position struct for x/y coordinates of a pixel */

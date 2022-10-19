@@ -64,11 +64,11 @@ uint8_t friendly_guesses[] =
 
 enum gameState
 {
-    MAIN_MENU,
-    WIN,
-    LOSE,
-    HIT,
-    MISS,
+    MAIN_MENU_SCREEN,
+    WIN_SCREEN,
+    LOSE_SCREEN,
+    HIT_SCREEN,
+    MISS_SCREEN,
     ATTACK,
     DEFEND,
 };
@@ -101,7 +101,6 @@ void update(void)
     navswitch_update();
     button_update();
     update_player();
-    update_rand();
 
     packet_t packet = {0};
 
@@ -172,7 +171,8 @@ void update(void)
                 // }
             }
             break;
-        case MAIN_MENU:
+        case MAIN_MENU_SCREEN:
+            update_rand();
             
             if(ir_uart_read_ready_p()) // Wait until receive '1',  as other player has pressed button first. Therefore set to Defend.
             {
@@ -193,7 +193,7 @@ void update(void)
             }
             break;
 
-        case HIT:
+        case HIT_SCREEN:
             if(time >= PACER_RATE * 4)
             {
                 time = 0;
@@ -201,7 +201,7 @@ void update(void)
             }
             time++;
             break;
-        case MISS:
+        case MISS_SCREEN:
             if(time >= PACER_RATE * 4)
             {
                 time = 0;
@@ -209,9 +209,9 @@ void update(void)
             }
             time++;
             break;
-        case WIN:
+        case WIN_SCREEN:
             break;
-        case LOSE:
+        case LOSE_SCREEN:
             break;
     }
 
@@ -256,35 +256,35 @@ void render(void)
             else
                 draw_map(enemy_guesses); //If top Button toggled to 0, draw enemy guesses map
             break;
-        case MAIN_MENU: //MAIN MENU
+        case MAIN_MENU_SCREEN: //MAIN MENU
             if(!title_set)
             {
                 tinygl_text("BATTLESHIPS"); //Draw main scroll
                 title_set = 1;
             }
             break;
-        case HIT:
+        case HIT_SCREEN:
             if(!hit_set)
             {
                 tinygl_text("HIT");
                 hit_set = 1;
             }
             break;
-        case MISS:
+        case MISS_SCREEN:
             if(!miss_set)
             {
                 tinygl_text("MISS");
                 miss_set = 1;
             }
             break;
-        case WIN:
+        case WIN_SCREEN:
             if(!win_set)
             {
                 tinygl_text("YOU WON");
                 win_set = 1;
             }
             break;
-        case LOSE:
+        case LOSE_SCREEN:
             if(!lose_set)
             {
                 tinygl_text("YOU LOSE");
@@ -300,7 +300,7 @@ int main(void)
 
     uint8_t render_time = 0;
 
-    game_state = MAIN_MENU; //Set gamestate to main menu to start 
+    game_state = MAIN_MENU_SCREEN; //Set gamestate to main menu to start 
 
     while (1)
     {

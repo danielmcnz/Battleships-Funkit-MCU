@@ -18,48 +18,32 @@ void renderer_init(void)
 }
 
 
-void draw_flashing_pixel(uint8_t x, uint8_t y)
+void draw_flashing_pixel(uint8_t frequency, uint8_t x, uint8_t y)
 {
+
     static uint16_t time = 0;
 
     tinygl_point_t point = {.x=x, .y=y};
-    if(time >= FLASHING_RATE/2)
+    if(time >= frequency / 2)
     {
-        tinygl_draw_point(point, 1);
-        if(time == FLASHING_RATE)
+        tinygl_draw_point(point, HIGH);
+        if(time == frequency)
             time = 0;
     } 
     else 
     {
-        tinygl_draw_point(point, 0);
+        tinygl_draw_point(point, LOW);
     }
 
     ++time;
 }
 
-void draw_dimmed_pixel(uint8_t x, uint8_t y)
-{
-    static uint16_t time = 0;
-
-    tinygl_point_t point = {.x=x, .y=y};
-    if(time >= FLASHING_RATE/4)
-    {
-        tinygl_draw_point(point, 1);
-        if(time == FLASHING_RATE/2)
-            time = 0;
-    } 
-    else 
-    {
-        tinygl_draw_point(point, 0);
-    }
-
-    ++time;
-}
 
 void draw_pixel(uint8_t x, uint8_t y)
 {
-    tinygl_draw_point((tinygl_point_t){.x=x, .y=y}, 1);
+    tinygl_draw_point((tinygl_point_t){.x=x, .y=y}, HIGH);
 }
+
 
 void draw_map(uint8_t map[])
 {
@@ -69,16 +53,17 @@ void draw_map(uint8_t map[])
         {
             switch(get_position_value(map, (pos_t){.x=x, .y=y}))
             {
-                case 1:
+                case HIT:
                     draw_pixel(x, y);
                     break;
-                case 2:
-                    draw_dimmed_pixel(x, y);
+                case MISS:
+                    draw_flashing_pixel(MISS_FREQUENCY, x, y);
                     break;
             }
         }
     }
 }
+
 
 void draw_clear(void)
 {
