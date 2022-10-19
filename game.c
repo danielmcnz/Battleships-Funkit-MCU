@@ -45,11 +45,11 @@ uint8_t enemy_guesses[] =
 
 // uint8_t friendly_guesses[] =
 // {
-//     0, 0, 0, 0, 0, 0, 2,
-//     0, 0, 0, 0, 2, 2, 0,
-//     0, 0, 0, 2, 2, 0, 2,
-//     0, 0, 0, 0, 1, 0, 0,
-//     0, 0, 0, 0, 0, 0, 0,
+//     1, 0, 1, 1, 1, 1, 0,
+//    1, 0, 0, 0, 0, 0, 0,
+//    1, 0, 0, 0, 0, 0, 0,
+//    0, 0, 1, 1, 1, 0, 0,
+//    0, 0, 0, 0, 1, 0, 0,
 // };
 
 uint8_t friendly_guesses[] =
@@ -128,11 +128,20 @@ void update(void)
                     
                     update_map(packet.coords, friendly_guesses, packet.result); //Update Map
                     
-                    /** @todo GAME WINNING
-                    */
-                    
-                    game_state = DEFEND; //Switch to defend once fired
+                    game_state = DEFEND; //Switch to defend once fired                    
                     prev_game_state = game_state;
+
+                    uint8_t win;
+                    while(!recv_win(&win))
+                    {
+                        continue;
+                    }
+
+                    if(win)
+                    {
+                        game_state = WIN_SCREEN;
+                    }
+
                     // if(packet.result == 1)
                     // {
                     //     game_state = HIT;
@@ -161,6 +170,17 @@ void update(void)
 
                 game_state = ATTACK;
                 prev_game_state = game_state;
+
+                if(has_player_won(friendly_ships, enemy_guesses))
+                {
+                    game_state = LOSE_SCREEN;
+                    
+                    while(!send_loss())
+                    {
+                        continue;
+                    }
+                }
+
                 // if(packet.result == 1)
                 // {
                 //     game_state = HIT;
@@ -210,8 +230,20 @@ void update(void)
             time++;
             break;
         case WIN_SCREEN:
+            if(time >= PACER_RATE * 4)
+            {
+                time = 0;
+                game_state = MAIN_MENU_SCREEN;
+            }
+            time++;
             break;
         case LOSE_SCREEN:
+            if(time >= PACER_RATE * 4)
+            {
+                time = 0;
+                game_state = MAIN_MENU_SCREEN;
+            }
+            time++;
             break;
     }
 
