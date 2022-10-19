@@ -9,12 +9,12 @@
 #include "random.h"
 
 
-void update_map(pos_t coords, uint8_t Map[], uint8_t RESULT){ //Updates a given pixel position with the RESULT value 
-    Map[MAP_HEIGHT * coords.x + (MAP_HEIGHT - 1) - coords.y] = RESULT;
+void update_map(pos_t coords, uint8_t map[], uint8_t result){ //Updates a given pixel position with the RESULT value 
+    map[MAP_HEIGHT * coords.x + (MAP_HEIGHT - 1) - coords.y] = result;
 }
 
 
-uint8_t generate_ships(uint8_t map[35], uint8_t locations[4][35]) //Generates a random map
+uint8_t generate_ships(uint8_t map[MAP_WIDTH*MAP_HEIGHT], uint8_t locations[N_SHIP_MAPS][MAP_WIDTH*MAP_HEIGHT]) //Generates a random map
 {
     uint8_t location = 3;// rand() % 3; //Gets the adress of a random map 
 

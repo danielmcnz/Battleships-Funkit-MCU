@@ -20,12 +20,12 @@ void renderer_init(void)
 
 void draw_flashing_pixel(uint16_t *time, uint8_t x, uint8_t y)
 {
-
+    // draws pixel for half of the period to act as a flashing pixel
     tinygl_point_t point = {.x=x, .y=y};
-    if(*time >= CURSOR_FREQUENCY / 2)
+    if(*time >= FLASHING_FREQUENCY / 2)
     {
         tinygl_draw_point(point, 1);
-        if(*time >= CURSOR_FREQUENCY)
+        if(*time >= FLASHING_FREQUENCY)
             *time = 0;
     } 
     else
@@ -47,6 +47,7 @@ void draw_map(uint16_t *time, uint8_t map[])
     {
         for(uint8_t y=0; y<MAP_HEIGHT; ++y)
         {
+            // renders pixel as flashing or static depending on pixel being a hit or miss, or ignored if neither
             switch(get_position_value(map, (pos_t){.x=x, .y=y}))
             {
                 case 1:

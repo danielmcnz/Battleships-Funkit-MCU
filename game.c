@@ -52,7 +52,7 @@ uint8_t friendly_guesses[] =
 };
 
 //Possible maps for game
-static uint8_t locations[N_SHIP_MAPS]][35] = 
+static uint8_t locations[N_SHIP_MAPS][35] = 
 {
     {
         1, 0, 1, 1, 1, 1, 0,

@@ -15,8 +15,6 @@
 #include "map.h"
 
 
-
-
 /** initializes renderer module */
 void renderer_init(void);
 

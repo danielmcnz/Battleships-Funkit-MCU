@@ -13,23 +13,19 @@
 #include "defs.h"
 
 
-/** @todo this */
-// void map_init(void);
-
-
 /** Updates a map 
  *  @param coords X/Y coordernate struct, 
  *  @param Map Map that needs to be updated
  *  @param RESULT The value to be written (0 = No guess/off, 1 = Hit/Fully on, 2 = Miss/Dimmed)
 */
-void update_map(pos_t coords, uint8_t Map[], uint8_t RESULT);
+void update_map(pos_t coords, uint8_t map[], uint8_t result);
 
 
 /** Generate random locations for friendly ships
  *  @param map friendly ships map
- *  @return @todo
+ *  @return enemy map index
 */
-uint8_t generate_ships(uint8_t map[35], uint8_t locations[4][35]);
+uint8_t generate_ships(uint8_t map[MAP_WIDTH*MAP_HEIGHT], uint8_t locations[N_SHIP_MAPS][MAP_WIDTH*MAP_HEIGHT]);
 
 
 /** Returns value in the given map of the given x and y position
