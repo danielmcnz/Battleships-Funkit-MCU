@@ -9,7 +9,7 @@
 #include "random.h"
 
 
-static uint8_t locations[N_SHIP_MAPS][35] = 
+uint8_t locations[N_SHIP_MAPS][35] = 
 {
     {
         1, 0, 1, 1, 1, 1, 0,
@@ -42,7 +42,7 @@ void update_map(pos_t coords, uint8_t Map[], uint8_t RESULT){ //Updates a given 
 
 void generate_ships(uint8_t map[35]) //Generates a random map
 {
-    uint8_t *location = locations[rand() % 3]; //Gets the adress of a random map 
+    uint8_t *location //= locations[2]; //Gets the adress of a random map 
 
     
     for (uint8_t i=0; i<MAP_WIDTH * MAP_HEIGHT; ++i) // fills map

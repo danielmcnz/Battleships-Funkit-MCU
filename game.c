@@ -54,13 +54,12 @@ uint8_t enemy_guesses[] =
 
 uint8_t friendly_guesses[] =
 {
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-};
-
+        1, 0, 1, 1, 1, 1, 0,
+        1, 0, 0, 0, 0, 0, 0,
+        1, 0, 0, 0, 0, 0, 0,
+        0, 0, 1, 1, 1, 0, 0,
+        0, 0, 0, 0, 1, 0, 0,
+    };
 
 enum gameState
 {
@@ -101,6 +100,7 @@ void update(void)
     navswitch_update();
     button_update();
     update_player();
+    update_rand();
 
     packet_t packet = {0};
 
@@ -172,7 +172,7 @@ void update(void)
             }
             break;
         case MAIN_MENU_SCREEN:
-            update_rand();
+            
             
             if(ir_uart_read_ready_p()) // Wait until receive '1',  as other player has pressed button first. Therefore set to Defend.
             {

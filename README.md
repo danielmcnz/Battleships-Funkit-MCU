@@ -1,9 +1,7 @@
 
 2) Comment Code
-3) Change formatting to 260 standard
-4) Group names in source files/makefile
-5)Make Infrared more reliable
-6) Maybe make another module?
+3) Change formatting to 260 standard (done?)
+4) Maybe make another module for update or map?
 
 
 
