@@ -26,7 +26,7 @@ void renderer_init(void);
  *  @param x x coordinate on the map
  *  @param y y coordinate on the map
 */
-void draw_flashing_pixel(uint16_t frequency, uint8_t x, uint8_t y);
+void draw_flashing_pixel(uint8_t frequency, uint8_t x, uint8_t y);
 
 
 /** Draws a pixel

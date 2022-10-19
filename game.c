@@ -42,32 +42,20 @@ uint8_t enemy_guesses[] =
     0, 0, 0, 0, 0, 0, 0,
 };
 
-
-// uint8_t friendly_guesses[] =
-// {
-//     1, 0, 1, 1, 1, 1, 0,
-//    1, 0, 0, 0, 0, 0, 0,
-//    1, 0, 0, 0, 0, 0, 0,
-//    0, 0, 1, 1, 1, 0, 0,
-//    0, 0, 0, 0, 1, 0, 0,
-// };
-
 uint8_t friendly_guesses[] =
 {
-        1, 0, 1, 1, 1, 1, 0,
-        1, 0, 0, 0, 0, 0, 0,
-        1, 0, 0, 0, 0, 0, 0,
-        0, 0, 1, 1, 1, 0, 0,
-        0, 0, 0, 0, 1, 0, 0,
-    };
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+};
 
 enum gameState
 {
     MAIN_MENU_SCREEN,
     WIN_SCREEN,
     LOSE_SCREEN,
-    HIT_SCREEN,
-    MISS_SCREEN,
     ATTACK,
     DEFEND,
 };
@@ -108,8 +96,6 @@ void update(void)
 
     static uint8_t nav_push_down = 0; //Has the navswitch button been pressed down
 
-    static uint16_t time = 0;
-
     switch(game_state)
     {
         case ATTACK: //ATTACK SCREEN GAME LOGIC
@@ -131,24 +117,15 @@ void update(void)
                     game_state = DEFEND; //Switch to defend once fired                    
                     prev_game_state = game_state;
 
-                    uint8_t win;
-                    while(!recv_win(&win))
-                    {
-                        continue;
-                    }
-
-                    if(win)
-                    {
-                        game_state = WIN_SCREEN;
-                    }
-
-                    // if(packet.result == 1)
+                    // uint8_t win;
+                    // while(!recv_win(&win))
                     // {
-                    //     game_state = HIT;
+                    //     continue;
                     // }
-                    // else
+
+                    // if(win)
                     // {
-                    //     game_state = MISS;
+                    //     game_state = WIN_SCREEN;
                     // }
 
                     nav_push_down = 0;                    
@@ -171,29 +148,18 @@ void update(void)
                 game_state = ATTACK;
                 prev_game_state = game_state;
 
-                if(has_player_won(friendly_ships, enemy_guesses))
-                {
-                    game_state = LOSE_SCREEN;
+                // if(has_player_won(friendly_ships, enemy_guesses))
+                // {
+                //     game_state = LOSE_SCREEN;
                     
-                    while(!send_loss())
-                    {
-                        continue;
-                    }
-                }
-
-                // if(packet.result == 1)
-                // {
-                //     game_state = HIT;
-                // }
-                // else
-                // {
-                //     game_state = MISS;
+                //     while(!send_loss())
+                //     {
+                //         continue;
+                //     }
                 // }
             }
             break;
         case MAIN_MENU_SCREEN:
-            
-            
             if(ir_uart_read_ready_p()) // Wait until receive '1',  as other player has pressed button first. Therefore set to Defend.
             {
                 if(ir_uart_getc() == 1)
@@ -212,38 +178,9 @@ void update(void)
                 }
             }
             break;
-
-        case HIT_SCREEN:
-            if(time >= PACER_RATE * 4)
-            {
-                time = 0;
-                game_state = prev_game_state;
-            }
-            time++;
-            break;
-        case MISS_SCREEN:
-            if(time >= PACER_RATE * 4)
-            {
-                time = 0;
-                game_state = prev_game_state;
-            }
-            time++;
-            break;
         case WIN_SCREEN:
-            if(time >= PACER_RATE * 4)
-            {
-                time = 0;
-                game_state = MAIN_MENU_SCREEN;
-            }
-            time++;
             break;
         case LOSE_SCREEN:
-            if(time >= PACER_RATE * 4)
-            {
-                time = 0;
-                game_state = MAIN_MENU_SCREEN;
-            }
-            time++;
             break;
     }
 
@@ -264,8 +201,6 @@ void render(void)
         draw_clear();
 
     static uint8_t title_set = 0;
-    static uint8_t hit_set = 0;
-    static uint8_t miss_set = 0;
     static uint8_t win_set = 0;
     static uint8_t lose_set = 0;
     
@@ -295,23 +230,10 @@ void render(void)
                 title_set = 1;
             }
             break;
-        case HIT_SCREEN:
-            if(!hit_set)
-            {
-                tinygl_text("HIT");
-                hit_set = 1;
-            }
-            break;
-        case MISS_SCREEN:
-            if(!miss_set)
-            {
-                tinygl_text("MISS");
-                miss_set = 1;
-            }
-            break;
         case WIN_SCREEN:
             if(!win_set)
             {
+                tinygl_text_mode_set(TINYGL_TEXT_MODE_STEP);
                 tinygl_text("W");
                 win_set = 1;
             }
@@ -319,6 +241,7 @@ void render(void)
         case LOSE_SCREEN:
             if(!lose_set)
             {
+                tinygl_text_mode_set(TINYGL_TEXT_MODE_STEP);
                 tinygl_text("L");
                 lose_set = 1;
             }
@@ -337,6 +260,7 @@ int main(void)
     while (1)
     {
         pacer_wait ();
+
         update(); // Update the game logic
 
         if(render_time == PACER_RATE / DISPLAY_RATE) //Draw screen at slower rate than game logic updates as it is not needed to very fast.

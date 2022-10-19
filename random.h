@@ -16,9 +16,8 @@ static uint8_t _rand = 1;
 static inline void update_rand(void)
 {
     _rand++; //Increasing value that resets when overflows. Used to create random seed for maps
-    if (_rand >= 3){
+    if (_rand >= 254){
         _rand = 0;
-        
     }
 }
 
@@ -27,5 +26,5 @@ static inline void update_rand(void)
 */
 static inline uint8_t rand(void)
 {
-    return 128;
+    return _rand;
 }

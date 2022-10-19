@@ -94,12 +94,7 @@ uint8_t send_loss(void)
         sent = 1;
     }
 
-    if(sent == 1)
-    {
-        sent = 0;
-        return 1;
-    }
-    return 0;
+    return sent;
 }
 
 
@@ -112,10 +107,5 @@ uint8_t recv_win(uint8_t *win)
         received = 1;
     }
     
-    if(received == 1)
-    {
-        received = 0;
-        return 1;
-    }
-    return 0;
+    return received;
 }

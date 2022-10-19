@@ -1,12 +1,12 @@
 #pragma once
 
 #define PACER_RATE 800
-#define DISPLAY_RATE 600
+#define DISPLAY_RATE 400
 
 #define MESSAGE_RATE 10
 
-#define CURSOR_FREQUENCY (uint16_t)(PACER_RATE / 2)
-#define MISS_FREQUENCY (uint16_t)(CURSOR_FREQUENCY / 2)
+#define CURSOR_FREQUENCY PACER_RATE / 2
+#define MISS_FREQUENCY CURSOR_FREQUENCY / 2
 
 #define MAP_WIDTH 5
 #define MAP_HEIGHT 7
