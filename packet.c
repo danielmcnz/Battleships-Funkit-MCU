@@ -63,7 +63,7 @@ uint8_t recv_coords(packet_t *packet, uint8_t friendly_ships[])
         uint8_t result = get_position_value(friendly_ships, packet->coords); // send hit or miss dependent on coordinates
         if(result == 0) //If a miss is sent, change result to 2, as this is what the map uses to render a miss
         {
-            result = MISS;
+            result = 2;
         }
 
         packet->result = result; //Pack has been 'filled' with X/Y/Result
@@ -81,31 +81,4 @@ uint8_t recv_coords(packet_t *packet, uint8_t friendly_ships[])
     }
 
     return 0;
-}
-
-
-uint8_t send_loss(void)
-{
-    static uint8_t sent = 0;
-
-    if(sent == 0 && ir_uart_write_ready_p())
-    {
-        ir_uart_putc(1);
-        sent = 1;
-    }
-
-    return sent;
-}
-
-
-uint8_t recv_win(uint8_t *win)
-{
-    static uint8_t received = 0;
-    if(received == 0 && ir_uart_read_ready_p())
-    {
-        *win = ir_uart_getc();
-        received = 1;
-    }
-    
-    return received;
 }

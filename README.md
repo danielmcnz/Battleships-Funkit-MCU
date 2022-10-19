@@ -1,10 +1,3 @@
-
-2) Comment Code
-3) Change formatting to 260 standard (done?)
-4) Maybe make another module for update or map?
-
-
-
 # Battleships - Funkit Project
 ## Daniel Mcgregor & Chester Hall-Fernandez
 ### 19/10/22

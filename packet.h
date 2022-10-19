@@ -42,15 +42,3 @@ uint8_t send_coords(packet_t *packet);
  *  @return returns 1 when finished communications and filled the packet, otherwise 0
 */
 uint8_t recv_coords(packet_t *packet, uint8_t friendly_ships[]);
-
-
-/**
- *  @todo this
-*/
-uint8_t send_loss(void);
-
-
-/**
- *  @todo this
-*/
-uint8_t recv_win(uint8_t *win);

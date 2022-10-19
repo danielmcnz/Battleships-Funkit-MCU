@@ -18,34 +18,30 @@ void renderer_init(void)
 }
 
 
-void draw_flashing_pixel(uint16_t frequency, uint8_t x, uint8_t y)
+void draw_flashing_pixel(uint16_t *time, uint8_t x, uint8_t y)
 {
 
-    static uint16_t time = 0;
-
     tinygl_point_t point = {.x=x, .y=y};
-    if(time >= frequency / 2)
+    if(*time >= CURSOR_FREQUENCY / 2)
     {
-        tinygl_draw_point(point, HIGH);
-        if(time == frequency)
-            time = 0;
+        tinygl_draw_point(point, 1);
+        if(*time >= CURSOR_FREQUENCY)
+            *time = 0;
     } 
-    else 
+    else
     {
-        tinygl_draw_point(point, LOW);
+        tinygl_draw_point(point, 0);
     }
-
-    ++time;
 }
 
 
 void draw_pixel(uint8_t x, uint8_t y)
 {
-    tinygl_draw_point((tinygl_point_t){.x=x, .y=y}, HIGH);
+    tinygl_draw_point((tinygl_point_t){.x=x, .y=y}, 1);
 }
 
 
-void draw_map(uint8_t map[])
+void draw_map(uint16_t *time, uint8_t map[])
 {
     for(uint8_t x=0; x<MAP_WIDTH; ++x)
     {
@@ -53,11 +49,11 @@ void draw_map(uint8_t map[])
         {
             switch(get_position_value(map, (pos_t){.x=x, .y=y}))
             {
-                case HIT:
+                case 1:
                     draw_pixel(x, y);
                     break;
-                case MISS:
-                    draw_flashing_pixel(MISS_FREQUENCY, x, y);
+                case 2:
+                    draw_flashing_pixel(time, x, y);
                     break;
             }
         }

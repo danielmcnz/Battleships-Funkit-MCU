@@ -26,7 +26,7 @@ void renderer_init(void);
  *  @param x x coordinate on the map
  *  @param y y coordinate on the map
 */
-void draw_flashing_pixel(uint16_t frequency, uint8_t x, uint8_t y);
+void draw_flashing_pixel(uint16_t *time, uint8_t x, uint8_t y);
 
 
 /** Draws a pixel
@@ -39,7 +39,7 @@ void draw_pixel(uint8_t x, uint8_t y);
 /** Draws the given map array onto the board
  *  @param map array of pixel values to draw
 */
-void draw_map(uint8_t map[]);
+void draw_map(uint16_t *time, uint8_t map[]);
 
 
 /** Clears the pixels on the board */

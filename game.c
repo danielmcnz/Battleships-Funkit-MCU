@@ -51,6 +51,38 @@ uint8_t friendly_guesses[] =
     0, 0, 0, 0, 0, 0, 0,
 };
 
+static uint8_t locations[4][35] = 
+{
+    {
+        1, 0, 1, 1, 1, 1, 0,
+        1, 0, 0, 0, 0, 0, 0,
+        1, 0, 0, 0, 0, 0, 0,
+        0, 0, 1, 1, 1, 0, 0,
+        0, 0, 0, 0, 1, 0, 0,
+    },
+    {
+        1, 1, 0, 0, 0, 1, 0,
+        0, 0, 0, 0, 0, 1, 0,
+        0, 0, 1, 1, 0, 1, 0,
+        0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 1, 1, 1, 1,
+    },
+    {
+        1, 1, 1, 1, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0,
+        0, 1, 1, 1, 0, 1, 1,
+        0, 0, 0, 0, 0, 0, 0,
+        0, 1, 1, 0, 0, 0, 0,
+    },
+    {
+        1, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0,
+    }
+};
+
 enum gameState
 {
     MAIN_MENU_SCREEN,
@@ -62,6 +94,8 @@ enum gameState
 
 static enum gameState prev_game_state;
 static enum gameState game_state;
+
+static int8_t enemy_map_val = 0;
 
 static int8_t top_button = 1;
 
@@ -100,7 +134,9 @@ void update(void)
     {
         case ATTACK: //ATTACK SCREEN GAME LOGIC
             if(navswitch_push_event_p(NAVSWITCH_PUSH)) //Updating nav pressed down
+            {
                 nav_push_down = 1;
+            }
 
             if (nav_push_down == 1 && top_button == 1) { //If a shot is fired, get X/Y position of cursor
                 packet.coords.x = get_player().x;
@@ -117,19 +153,15 @@ void update(void)
                     game_state = DEFEND; //Switch to defend once fired                    
                     prev_game_state = game_state;
 
-                    // uint8_t win;
-                    // while(!recv_win(&win))
-                    // {
-                    //     continue;
-                    // }
-
-                    // if(win)
-                    // {
-                    //     game_state = WIN_SCREEN;
-                    // }
+                    
+                    if(has_player_won(locations[enemy_map_val], friendly_guesses))
+                    {
+                        game_state = WIN_SCREEN;
+                    }                              
 
                     nav_push_down = 0;                    
                 }
+
             }
             
             break;
@@ -142,30 +174,25 @@ void update(void)
                 
                 update_map(packet.coords, enemy_guesses, packet.result); //Update Map
 
-                /** @todo GAME WINNING
-                                    */
-
                 game_state = ATTACK;
                 prev_game_state = game_state;
 
-                // if(has_player_won(friendly_ships, enemy_guesses))
-                // {
-                //     game_state = LOSE_SCREEN;
-                    
-                //     while(!send_loss())
-                //     {
-                //         continue;
-                //     }
-                // }
+                if(has_player_won(friendly_ships, enemy_guesses))
+                {
+                    game_state = LOSE_SCREEN;
+                }
+                
             }
             break;
         case MAIN_MENU_SCREEN:
             if(ir_uart_read_ready_p()) // Wait until receive '1',  as other player has pressed button first. Therefore set to Defend.
             {
-                if(ir_uart_getc() == 1)
+                int8_t res = ir_uart_getc();
+                if(res > -1)
                 {
+                    enemy_map_val = res;
                     game_state = DEFEND; 
-                    generate_ships(friendly_ships);
+                    generate_ships(friendly_ships, locations);
                 }
             }
             else
@@ -173,8 +200,8 @@ void update(void)
                 if(navswitch_push_event_p(NAVSWITCH_PUSH)) //Send '1' to other player, telling them to defend and you set to attack first. 
                 {
                     game_state = ATTACK;
-                    generate_ships(friendly_ships);
-                    ir_uart_putc(1);
+                    enemy_map_val = generate_ships(friendly_ships, locations);
+                    ir_uart_putc(enemy_map_val);
                 }
             }
             break;
@@ -184,7 +211,6 @@ void update(void)
             break;
     }
 
-
     if(button_push_event_p(BUTTON1)) //Update top button toggle, which is used in the renderer function to update screen/ 
         top_button = -top_button;
 
@@ -193,11 +219,11 @@ void update(void)
 
 /**Deterimes what to draw to the screen
 */
-void render(void)
+void render(uint16_t *time)
 {
     tinygl_update();
         
-    if(game_state > MISS)
+    if(game_state > LOSE_SCREEN)
         draw_clear();
 
     static uint8_t title_set = 0;
@@ -209,19 +235,19 @@ void render(void)
         case ATTACK: //ATTACK MODE
             if(top_button == 1) 
             {
-                draw_map(friendly_guesses); //If top Button toggled to one, draw your guesses map
-                draw_flashing_pixel(CURSOR_FREQUENCY, get_player().x, get_player().y); //Draw 'aiming' cursor over top
+                draw_map(time, friendly_guesses); //If top Button toggled to one, draw your guesses map
+                draw_flashing_pixel(time, get_player().x, get_player().y); //Draw 'aiming' cursor over top
             }
             else
-                draw_map(enemy_guesses); //If top Button toggled to 0, draw enemy guesses map
+                draw_map(time, enemy_guesses); //If top Button toggled to 0, draw enemy guesses map
             break;
         case DEFEND: //DEFEND MODE
             if(top_button == 1)
             {
-                draw_map(friendly_ships); //If top Button toggled to one, draw your ships map
+                draw_map(time, friendly_ships); //If top Button toggled to one, draw your ships map
             } 
             else
-                draw_map(enemy_guesses); //If top Button toggled to 0, draw enemy guesses map
+                draw_map(time, enemy_guesses); //If top Button toggled to 0, draw enemy guesses map
             break;
         case MAIN_MENU_SCREEN: //MAIN MENU
             if(!title_set)
@@ -233,6 +259,7 @@ void render(void)
         case WIN_SCREEN:
             if(!win_set)
             {
+                draw_clear();
                 tinygl_text_mode_set(TINYGL_TEXT_MODE_STEP);
                 tinygl_text("W");
                 win_set = 1;
@@ -241,6 +268,7 @@ void render(void)
         case LOSE_SCREEN:
             if(!lose_set)
             {
+                draw_clear();
                 tinygl_text_mode_set(TINYGL_TEXT_MODE_STEP);
                 tinygl_text("L");
                 lose_set = 1;
@@ -253,23 +281,23 @@ int main(void)
 { 
     initialize(); //Initalise everything
 
+    uint16_t time = 0;
     uint8_t render_time = 0;
 
     game_state = MAIN_MENU_SCREEN; //Set gamestate to main menu to start 
 
     while (1)
     {
-        pacer_wait ();
+        pacer_wait();
 
         update(); // Update the game logic
 
         if(render_time == PACER_RATE / DISPLAY_RATE) //Draw screen at slower rate than game logic updates as it is not needed to very fast.
         {
-            render(); 
+            render(&time); 
             render_time = 0; 
-        }   
-
-        
+            ++time;
+        }
 
         ++render_time;
     }

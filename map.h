@@ -27,8 +27,9 @@ void update_map(pos_t coords, uint8_t Map[], uint8_t RESULT);
 
 /** Generate random locations for friendly ships
  *  @param map friendly ships map
+ *  @return @todo
 */
-void generate_ships(uint8_t map[35]);
+uint8_t generate_ships(uint8_t map[35], uint8_t locations[4][35]);
 
 
 /** Returns value in the given map of the given x and y position
