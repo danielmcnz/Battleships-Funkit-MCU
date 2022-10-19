@@ -2,7 +2,7 @@
  *  @file   player.h
  *  @author D. McGregor, C. Hall-Fernandez
  *  @date   18 October 2022
- *  @brief  player module
+ *  @brief  Updates the player postion (Cursor when guessing), and also checks if player has won the game.
  */
 
 #pragma once
