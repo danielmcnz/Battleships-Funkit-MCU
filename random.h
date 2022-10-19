@@ -2,7 +2,7 @@
  *  @file   random.h
  *  @author D. McGregor, C. Hall-Fernandez
  *  @date   18 October 2022
- *  @brief  Random variable module
+ *  @brief  Random variable module, used for generating random ship maps
  */
 
 #pragma once
