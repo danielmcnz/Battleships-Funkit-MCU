@@ -20,8 +20,11 @@
 #define N_SHIP_MAPS 3
 
 
+/** position struct for x/y coordinates of a pixel */
 typedef struct
 {
+    /** x coordinate */
     uint8_t x;
+    /** y coordinate */
     uint8_t y;
 } pos_t;
