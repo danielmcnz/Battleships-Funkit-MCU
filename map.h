@@ -1,6 +1,9 @@
 /**
- * @todo this
-*/
+ *  @file   map.h
+ *  @author D. McGregor, C. Hall-Fernandez
+ *  @date   18 October 2022
+ *  @brief  map module and map support functions
+ */
 
 #pragma once
 
@@ -28,5 +31,9 @@ void update_map(pos_t coords, uint8_t Map[], uint8_t RESULT);
 void generate_ships(uint8_t map[35]);
 
 
-/** @todo this */
+/** Returns value in the given map of the given x and y position
+ *  @param map uint8_t array of pixels
+ *  @param position x and y coordinates of the wanted pixel value
+ *  @return value of the pixel at the given x and y position
+ */
 uint8_t get_position_value(uint8_t map[], pos_t position);

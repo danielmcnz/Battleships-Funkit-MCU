@@ -1,6 +1,9 @@
 /**
- * @todo this
-*/
+ *  @file   map.c
+ *  @author D. McGregor, C. Hall-Fernandez
+ *  @date   18 October 2022
+ *  @brief  map module and map support functions
+ */
 
 #include "map.h"
 #include "random.h"
