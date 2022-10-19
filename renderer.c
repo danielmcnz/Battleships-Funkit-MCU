@@ -18,7 +18,7 @@ void renderer_init(void)
 }
 
 
-void draw_flashing_pixel(uint8_t frequency, uint8_t x, uint8_t y)
+void draw_flashing_pixel(uint16_t frequency, uint8_t x, uint8_t y)
 {
 
     static uint16_t time = 0;
