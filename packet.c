@@ -82,3 +82,40 @@ uint8_t recv_coords(packet_t *packet, uint8_t friendly_ships[])
 
     return 0;
 }
+
+
+uint8_t send_loss(void)
+{
+    static uint8_t sent = 0;
+
+    if(sent == 0 && ir_uart_write_ready_p())
+    {
+        ir_uart_putc(1);
+        sent = 1;
+    }
+
+    if(sent == 1)
+    {
+        sent = 0;
+        return 1;
+    }
+    return 0;
+}
+
+
+uint8_t recv_win(uint8_t *win)
+{
+    static uint8_t received = 0;
+    if(received == 0 && ir_uart_read_ready_p())
+    {
+        *win = ir_uart_getc();
+        received = 1;
+    }
+    
+    if(received == 1)
+    {
+        received = 0;
+        return 1;
+    }
+    return 0;
+}
