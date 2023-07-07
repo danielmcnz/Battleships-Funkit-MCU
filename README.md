@@ -3,7 +3,7 @@
 ### 19/10/22
 
 
-This is a 2 player game using the UC Funkit development board. It aims to accurately represent the popular board game 'battleships'.  
+This is a two player game using the UC Funkit development board. It aims to accurately represent the popular board game 'battleships'.  
 
 Upon starting the game, the words 'battleships' scroll across the screen. To begin a player presses the navswitch. The ship maps get randomly assigned based of an internal library, and the player who pressed the button begins on attack. 
 
